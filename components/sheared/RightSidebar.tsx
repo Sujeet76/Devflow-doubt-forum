@@ -56,7 +56,7 @@ const tags = [
 
 const RightSidebar = () => {
   return (
-    <aside className="background-light900_dark200 light-border custom-scrollbar sticky left-0 top-0 flex h-screen flex-col  gap-6 overflow-y-auto border-r px-4 pb-6 pt-32 shadow-light-300 dark:shadow-none max-xl:hidden lg:w-[350px]">
+    <aside className="background-light900_dark200 light-border custom-scrollbar sticky right-0 top-0 flex h-screen flex-col  gap-6 overflow-y-auto border-r px-4 pb-6 pt-36 shadow-light-300 dark:shadow-none max-xl:hidden lg:w-[350px]">
       <div>
         <h3 className="h3-bold text-dark200_light900 text-xl">Hot Network</h3>
         <div className="mt-7 flex w-full flex-col gap-[30px]">

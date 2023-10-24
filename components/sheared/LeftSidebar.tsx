@@ -10,7 +10,7 @@ const LeftSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="background-light900_dark200 light-border custom-scrollbar sticky left-0 top-0 flex h-screen flex-col justify-between gap-6 overflow-y-auto border-r px-4 pb-6 pt-32 shadow-light-300 dark:shadow-none max-sm:hidden lg:w-[240px]">
+    <aside className="background-light900_dark200 light-border custom-scrollbar sticky left-0 top-0 flex h-screen flex-col justify-between gap-6 overflow-y-auto border-r px-4 pb-6 pt-36 shadow-light-300 dark:shadow-none max-sm:hidden lg:w-[240px]">
       <div className="absolute -top-1/2 right-1/2 z-[-1] hidden h-[57rem] w-[40rem] shrink-0 select-none rounded-full bg-[#1a1a34] opacity-[0.5] blur-[178.5px] dark:block" />
       <div className="flex flex-1 flex-col gap-4">
         {sidebarLinks.map((item) => {
