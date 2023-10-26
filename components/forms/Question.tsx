@@ -6,7 +6,10 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { QuestionSchema } from "../../lib/validation";
+import Image from "next/image";
 import { Editor } from "@tinymce/tinymce-react";
+import { useRouter, usePathname } from "next/navigation";
+
 // ui import
 import {
   Form,
@@ -20,11 +23,18 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
-import Image from "next/image";
+import { createQuestion } from "@/lib/actions/question.action";
 
 const type: string = "submit";
 
-const QuestionForm = () => {
+interface Props {
+  mongoUserId: string;
+}
+
+const QuestionForm = ({ mongoUserId }: Props) => {
+  const route = useRouter();
+  const pathname = usePathname();
+
   // tiny editor
   const editorRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,15 +49,24 @@ const QuestionForm = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof QuestionSchema>) {
+  async function onSubmit(values: z.infer<typeof QuestionSchema>) {
     try {
       setIsSubmitting(true);
       // make db call -> connect to db
       // collect question data
       // send to api
-      //
+      await createQuestion({
+        title: values.title,
+        content: values.explanation,
+        tags: values.tags,
+        author: JSON.parse(mongoUserId),
+      });
+
+      // navigate to homepage
+      route.push("/");
     } catch (e) {
-      console.log("Error while creating Question", e);
+      console.log("Error while creating Question(F) -> ", e);
+      throw new Error("Error while creating Question");
     } finally {
       setIsSubmitting(false);
     }
@@ -138,6 +157,8 @@ const QuestionForm = () => {
                       editorRef.current = editor;
                     }}
                     initialValue=""
+                    onBlur={field.onBlur}
+                    onEditorChange={(content) => field.onChange(content)}
                     init={{
                       height: 350,
                       menubar: false,
@@ -226,7 +247,7 @@ const QuestionForm = () => {
             className="primary-gradient w-fit !text-light-900"
           >
             {isSubmitting ? (
-              <>{type === "edit" ? "Editing" : "Posting"}</>
+              <>{type === "edit" ? "Editing..." : "Posting..."}</>
             ) : (
               <>{type === "edit" ? "Edit Question" : "Ask a Question"}</>
             )}
