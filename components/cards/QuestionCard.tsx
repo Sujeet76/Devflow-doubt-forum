@@ -54,10 +54,10 @@ const QuestionCard = ({
       {/* flex-between(not tailwind class) -> flex justify-between items-center (refer to globals.css) */}
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
         <Metric
-          imgUrl="/assets/icons/avatar.svg"
+          imgUrl={author.picture}
           alt="avatar"
           value={author.name}
-          title={` - asked ${getTimeStamp(createdAt)}`}
+          title={` • asked ${getTimeStamp(createdAt)}`}
           textStyle="body-medium text-dark400_light700"
           href={`/profile/${author._id}`}
           isAuthor
