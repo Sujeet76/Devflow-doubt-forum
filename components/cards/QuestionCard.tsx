@@ -18,7 +18,7 @@ interface QuestionProps {
   answers: Array<Object>;
   upvotes: number;
   views: number;
-  createAt: Date;
+  createdAt: Date;
 }
 
 const QuestionCard = ({
@@ -29,14 +29,14 @@ const QuestionCard = ({
   answers,
   upvotes,
   views,
-  createAt,
+  createdAt,
 }: QuestionProps) => {
   return (
     <div className="card-wrapper rounded-[10px] p-9 sm:px-11">
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
         <div>
           <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
-            {getTimeStamp(createAt)}
+            {getTimeStamp(createdAt)}
           </span>
           <Link href={`/question/${_id}`}>
             <h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1">
@@ -57,7 +57,7 @@ const QuestionCard = ({
           imgUrl="/assets/icons/avatar.svg"
           alt="avatar"
           value={author.name}
-          title={` - asked ${getTimeStamp(createAt)}`}
+          title={` - asked ${getTimeStamp(createdAt)}`}
           textStyle="body-medium text-dark400_light700"
           href={`/profile/${author._id}`}
           isAuthor

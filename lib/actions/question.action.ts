@@ -24,7 +24,6 @@ export const getQuestions = async (params: GetQuestionsParams) => {
     return { questions };
   } catch (error) {
     console.log("Error while fetching question(s) => ", error);
-    throw new Error("Error while fetching question");
   }
 };
 
@@ -59,9 +58,8 @@ export const createQuestion = async (params: CreateQuestionParams) => {
     // Increment author's reputation by +5 for creating a question
 
     // revalidatePath => to eliminate the refresh the page
-    // revalidatePath(path);
+    revalidatePath(path);
   } catch (error) {
     console.log("Error while creating question => ", error);
-    throw Error;
   }
 };

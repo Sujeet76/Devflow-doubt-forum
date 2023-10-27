@@ -54,7 +54,7 @@ const QuestionSchema = new Schema({
       ref: "Answer",
     },
   ],
-  createAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const Question =
