@@ -56,31 +56,31 @@ const tags = [
 
 const RightSidebar = () => {
   return (
-    <aside className="background-light900_dark200 light-border custom-scrollbar sticky right-0 top-0 flex h-screen flex-col  gap-6 overflow-y-auto border-r px-4 pb-6 pt-36 shadow-light-300 dark:shadow-none max-xl:hidden lg:w-[350px]">
+    <aside className='background-light900_dark200 light-border custom-scrollbar sticky right-0 top-0 flex h-screen flex-col  gap-6 overflow-y-auto border-r px-4 pb-6 pt-36 shadow-light-300 dark:shadow-none max-xl:hidden lg:w-[350px]'>
       <div>
-        <h3 className="h3-bold text-dark200_light900 text-xl">Hot Network</h3>
-        <div className="mt-7 flex w-full flex-col gap-[30px]">
+        <h3 className='h3-bold text-dark200_light900 text-xl'>Hot Network</h3>
+        <div className='mt-7 flex w-full flex-col gap-[30px]'>
           {questions.map((item, index) => (
             <Link
-              href="#"
+              href='#'
               key={index}
-              className="flex cursor-pointer items-center justify-between gap-7"
+              className='flex cursor-pointer items-center justify-between gap-7'
             >
-              <p className="body-medium text-dark500_light700">{item}</p>
+              <p className='body-medium text-dark500_light700'>{item}</p>
               <Image
-                src="/assets/icons/chevron-right.svg"
-                alt="right arrow"
+                src='/assets/icons/chevron-right.svg'
+                alt='right arrow'
                 width={20}
                 height={20}
-                className="invert-colors"
+                className='invert-colors'
               />
             </Link>
           ))}
         </div>
       </div>
-      <div className="mt-16">
-        <h3 className="h3-bold text-dark200_light900 text-xl">Popular Tags</h3>
-        <div className="mt-7 flex w-full flex-col gap-[30px]">
+      <div className='mt-16'>
+        <h3 className='h3-bold text-dark200_light900 text-xl'>Popular Tags</h3>
+        <div className='mt-7 flex w-full flex-col gap-[30px]'>
           {tags.map((tag) => (
             <RenderTag
               key={tag._id}

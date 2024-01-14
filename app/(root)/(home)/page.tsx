@@ -14,31 +14,34 @@ export default async function Home() {
   return (
     <>
       <div>
-        <div className="flex w-full flex-col justify-between gap-4 sm:flex-row-reverse">
-          <Link href="/ask-question" className="self-end">
-            <Button className="primary-gradient min-h-[46px] rounded-[10px] border-none px-4 py-3 !font-medium text-light-900">
+        <div className='flex w-full flex-col justify-between gap-4 sm:flex-row-reverse'>
+          <Link
+            href='/ask-question'
+            className='self-end'
+          >
+            <Button className='primary-gradient min-h-[46px] rounded-[10px] border-none px-4 py-3 !font-medium text-light-900'>
               Ask a Question
             </Button>
           </Link>
-          <h1 className="h1-bold text-dark100_light900">All Question</h1>
+          <h1 className='h1-bold text-dark100_light900'>All Question</h1>
         </div>
-        <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
+        <div className='mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
           <LocalSearch
-            icon="/assets/icons/search.svg"
-            placeholder="Search for Questions Here..."
-            iconPosition="left"
+            icon='/assets/icons/search.svg'
+            placeholder='Search for Questions Here...'
+            iconPosition='left'
           />
           <Filters
             filters={QuestionFilters}
-            otherClasses="min-h-[56px] sm:min-w-[170px]"
-            containerClasses="hidden max-md:flex"
+            otherClasses='min-h-[56px] sm:min-w-[170px]'
+            containerClasses='hidden max-md:flex'
           />
         </div>
         <HomeFilters />
       </div>
 
       {/* card component */}
-      <div className="mt-10 flex w-full flex-col gap-6">
+      <div className='mt-10 flex w-full flex-col gap-6'>
         {result && result.questions.length > 0 ? (
           result.questions.map((question) => (
             <QuestionCard
@@ -55,12 +58,12 @@ export default async function Home() {
           ))
         ) : (
           <NoResult
-            title="There are no question to show"
+            title='There are no question to show'
             description={`Be the first to break the silence! 🚀 Ask a Question and kickstart the
             discussion. our query could be the next big thing others learn from. Get
             involved! 💡`}
-            link="/ask-question"
-            linkTitle="Ask a Question"
+            link='/ask-question'
+            linkTitle='Ask a Question'
           />
         )}
       </div>

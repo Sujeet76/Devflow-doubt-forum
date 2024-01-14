@@ -154,4 +154,7 @@
       rgba(19, 22, 28, 0.7) 100%
     );
   }
+  .custom-shadow {
+    box-shadow: 10px 10px 20px 0px rgba(219, 214, 214, 0.188);
+  }
 }
