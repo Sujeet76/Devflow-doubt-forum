@@ -6,11 +6,14 @@ import {
   CreateUserParams,
   DeleteUserParams,
   GetAllUsersParams,
+  GetSavedQuestionsParams,
   ToggleSaveQuestionParams,
   UpdateUserParams,
 } from "./shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.modal";
+import Tag from "@/database/tag.modal";
+import { FilterQuery } from "mongoose";
 
 export async function getUserById(params: any) {
   try {
@@ -130,6 +133,42 @@ export async function getAllUsers(params: GetAllUsersParams) {
   }
 }
 
+export async function getSavedQuestions(params: GetSavedQuestionsParams) {
+  try {
+    connectToDB();
+
+    const { clerkId, page = 1, pageSize = 10, filter, searchQuery } = params;
+
+    const query: FilterQuery<typeof Question> = searchQuery
+      ? { title: { $regex: new RegExp(searchQuery, "i") } }
+      : {};
+
+    const savedQuestion = await User.findOne({ clerkId })
+      .populate({
+        path: "saved",
+        select: "-content",
+        match: query,
+        options: {
+          sort: { createdAt: -1 },
+          skip: (page - 1) * pageSize,
+        },
+        populate: [
+          { path: "author", model: User, select: "_id clerkId name picture" },
+          { path: "tags", model: Tag, select: "_id name" },
+        ],
+      })
+      .select("_id clerkId");
+
+    if (!savedQuestion) {
+      throw new Error("No saved question found");
+    }
+
+    return savedQuestion;
+  } catch (error) {
+    console.log("Error while => ", error);
+    throw new Error("Error while getting saved questions");
+  }
+}
 // export async function getAllUsers(params: GetAllUsersParams) {
 //   try {
 //     connectToDB();

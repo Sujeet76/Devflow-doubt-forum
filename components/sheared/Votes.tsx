@@ -6,13 +6,15 @@ import {
   downvoteQuestion,
   upvoteQuestion,
 } from "@/lib/actions/question.action";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answer.action";
 import { toggleSaveQuestion } from "@/lib/actions/user.action";
+import { useEffect } from "react";
+import { viewQuestion } from "@/lib/actions/interaction.action";
 
 interface VotesProps {
   type: string;
-  itemsId: string;
+  itemId: string;
   userId: string;
   upvotes: number;
   hasupVoted: boolean;
@@ -23,7 +25,7 @@ interface VotesProps {
 
 const Votes = ({
   type,
-  itemsId,
+  itemId,
   userId,
   upvotes,
   hasupVoted,
@@ -32,6 +34,7 @@ const Votes = ({
   hasSaved,
 }: VotesProps) => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const handleVote = async (action: string) => {
     if (!userId) return;
@@ -40,14 +43,14 @@ const Votes = ({
       if (type === "question") {
         console.log("upvote");
         await upvoteQuestion({
-          questionId: JSON.parse(itemsId),
+          questionId: JSON.parse(itemId),
           userId: JSON.parse(userId),
           hasupVoted,
           path: pathname,
         });
       } else if (type === "answer") {
         await upvoteAnswer({
-          answerId: JSON.parse(itemsId),
+          answerId: JSON.parse(itemId),
           userId: JSON.parse(userId),
           hasupVoted,
           path: pathname,
@@ -58,14 +61,14 @@ const Votes = ({
     if (action === "downvote") {
       if (type === "question") {
         await downvoteQuestion({
-          questionId: JSON.parse(itemsId),
+          questionId: JSON.parse(itemId),
           userId: JSON.parse(userId),
           hasdownVoted,
           path: pathname,
         });
       } else if (type === "answer") {
         await downvoteAnswer({
-          answerId: JSON.parse(itemsId),
+          answerId: JSON.parse(itemId),
           userId: JSON.parse(userId),
           hasdownVoted,
           path: pathname,
@@ -74,9 +77,16 @@ const Votes = ({
     }
   };
 
+  useEffect(() => {
+    viewQuestion({
+      questionId: JSON.parse(itemId),
+      userId: userId ? JSON.parse(userId) : undefined,
+    });
+  }, [itemId, userId, pathname, router]);
+
   const saveToCollection = async () => {
     await toggleSaveQuestion({
-      questionId: JSON.parse(itemsId),
+      questionId: JSON.parse(itemId),
       userId: JSON.parse(userId),
       path: pathname,
     });

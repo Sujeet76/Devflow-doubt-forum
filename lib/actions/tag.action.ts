@@ -1,7 +1,13 @@
 import User from "@/database/user.modal";
 import { connectToDB } from "../mongoose";
-import { GetAllTagsParams, GetTopInteractedTagsParams } from "./shared.types";
+import {
+  GetAllTagsParams,
+  GetQuestionsByTagIdParams,
+  GetTopInteractedTagsParams,
+} from "./shared.types";
 import Tag from "@/database/tag.modal";
+import Question from "@/database/question.modal";
+import { FilterQuery } from "mongoose";
 
 export async function getTopInteractionTags(
   params: GetTopInteractedTagsParams
@@ -9,7 +15,7 @@ export async function getTopInteractionTags(
   try {
     connectToDB();
 
-    const { userId, limit = 3 } = params;
+    const { userId } = params;
 
     const user = await User.findById(userId);
 
@@ -39,6 +45,50 @@ export async function getAllTags(params: GetAllTagsParams) {
     // Interaction...
 
     return { tags };
+  } catch (error) {
+    console.log("Error while => ", error);
+  }
+}
+
+export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
+  try {
+    connectToDB();
+
+    const { tagId, page = 1, pageSize = 10, searchQuery } = params;
+
+    const query: FilterQuery<typeof Question> = searchQuery
+      ? { $regex: new RegExp(searchQuery, "i") }
+      : {};
+
+    const questions = await Tag.findById(tagId).populate({
+      path: "questions",
+      model: Question,
+      select: "-content",
+      match: query,
+      options: {
+        sort: { createdAt: -1 },
+        skip: (page - 1) * pageSize,
+        limit: pageSize,
+      },
+      populate: [
+        {
+          path: "author",
+          model: User,
+          select: "_id clerkId fullName picture",
+        },
+        {
+          path: "tags",
+          model: Tag,
+          select: "_id name",
+        },
+      ],
+    });
+
+    if (!questions) {
+      throw Error("No question found");
+    }
+
+    return { title: questions.name, questions: questions?.questions };
   } catch (error) {
     console.log("Error while => ", error);
   }
