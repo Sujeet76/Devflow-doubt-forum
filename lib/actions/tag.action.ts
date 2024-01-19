@@ -31,7 +31,7 @@ export async function getAllTags(params: GetAllTagsParams) {
   try {
     connectToDB();
 
-    const { page = 1, pageSize = 20, filter, searchQuery } = params;
+    // const { page = 1, pageSize = 20, filter, searchQuery } = params;
 
     const tags = await Tag.find({}).sort({ createdAt: -1 });
 

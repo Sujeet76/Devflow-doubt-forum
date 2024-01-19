@@ -7,6 +7,7 @@ import {
   CreateQuestionParams,
   GetQuestionByIdParams,
   GetQuestionsParams,
+  QuestionVoteParams,
 } from "./shared.types";
 import User from "@/database/user.modal";
 import { revalidatePath } from "next/cache";
@@ -87,5 +88,77 @@ export const getQuestionById = async (params: GetQuestionByIdParams) => {
   } catch (error) {
     console.log("Error while getting question by id => ", error);
     throw new Error(`Error while getting question by id => ${error}`);
+  }
+};
+
+export const upvoteQuestion = async (params: QuestionVoteParams) => {
+  try {
+    connectToDB();
+    const { questionId, userId, hasupVoted, path } = params;
+    let updateQuery = {};
+
+    // if the user has already upvoted the question, remove the downvote
+    if (hasupVoted) {
+      updateQuery = { $pull: { upvotes: userId } };
+    } else {
+      // if the user has not already upvoted the question, add the upvote and also remove downvote if user has already downvoted the question
+      // mongodb doest not throe error when $pull it doest not find the element
+      updateQuery = {
+        $addToSet: {
+          upvotes: userId,
+        },
+        $pull: { downvotes: userId },
+      };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    // increment the users reputation
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log("Error while upvote => ", error);
+  }
+};
+
+export const downvoteQuestion = async (params: QuestionVoteParams) => {
+  try {
+    connectToDB();
+    const { questionId, userId, hasdownVoted, path } = params;
+    let updateQuery = {};
+
+    // if the user has already downvoted the question, remove the downvote
+    if (hasdownVoted) {
+      updateQuery = { $pull: { downvotes: userId } };
+    } else {
+      // if the user has not already downvoted the question, add the downvote and also remove upvote if user has upvoted the question
+      // mongodb doest not throe error when $pull it doest not find the element
+      updateQuery = {
+        $addToSet: {
+          downvotes: userId,
+        },
+        $pull: { upvotes: userId },
+      };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    // increment the users reputation
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log("Error while upvote => ", error);
   }
 };

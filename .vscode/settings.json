@@ -1,8 +1,12 @@
 {
   "cSpell.words": [
     "aspnet",
+    "camelcase",
+    "clsx",
     "darkgradient",
     "darknone",
+    "downvote",
+    "downvoted",
     "downvotes",
     "hasdown",
     "hasup",
@@ -14,6 +18,8 @@
     "svix",
     "tailwindcss",
     "tinymce",
+    "upvote",
+    "upvoted",
     "Upvotes"
   ]
 }

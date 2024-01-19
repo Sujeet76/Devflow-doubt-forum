@@ -6,6 +6,7 @@ import {
   CreateUserParams,
   DeleteUserParams,
   GetAllUsersParams,
+  ToggleSaveQuestionParams,
   UpdateUserParams,
 } from "./shared.types";
 import { revalidatePath } from "next/cache";
@@ -41,6 +42,28 @@ export async function createUser(userData: CreateUserParams) {
     throw new Error("Error while create user");
   }
 }
+
+export const toggleSaveQuestion = async (params: ToggleSaveQuestionParams) => {
+  try {
+    connectToDB();
+    const { questionId, userId, path } = params;
+    const isSaved = await User.findById(userId);
+
+    if (isSaved.saved.includes(questionId)) {
+      await User.findByIdAndUpdate(userId, {
+        $pull: { saved: questionId },
+      });
+    } else {
+      await User.findByIdAndUpdate(userId, {
+        $addToSet: { saved: questionId },
+      });
+    }
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log("Error while saving Question to collection", error);
+  }
+};
 
 export async function updateUser(params: UpdateUserParams) {
   try {

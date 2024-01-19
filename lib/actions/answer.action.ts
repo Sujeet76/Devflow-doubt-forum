@@ -2,7 +2,11 @@
 
 import Answer from "@/database/answer.modal";
 import { connectToDB } from "../mongoose";
-import { CreateAnswerParams, GetAnswersParams } from "./shared.types";
+import {
+  AnswerVoteParams,
+  CreateAnswerParams,
+  GetAnswersParams,
+} from "./shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.modal";
 
@@ -37,5 +41,77 @@ export const getAnswers = async (params: GetAnswersParams) => {
     return { answers };
   } catch (error) {
     console.log("Error while fetching answer ", error);
+  }
+};
+
+export const upvoteAnswer = async (params: AnswerVoteParams) => {
+  try {
+    connectToDB();
+    const { answerId, userId, hasupVoted, path } = params;
+    let updateQuery = {};
+
+    // if the user has already upvoted the question, remove the downvote
+    if (hasupVoted) {
+      updateQuery = { $pull: { upvotes: userId } };
+    } else {
+      // if the user has not already upvoted the question, add the upvote and also remove downvote if user has already downvoted the question
+      // mongodb doest not throe error when $pull it doest not find the element
+      updateQuery = {
+        $addToSet: {
+          upvotes: userId,
+        },
+        $pull: { downvotes: userId },
+      };
+    }
+
+    const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
+      new: true,
+    });
+
+    if (!answer) {
+      throw new Error("Question not found");
+    }
+
+    // increment the users reputation
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log("Error while upvote answer => ", error);
+  }
+};
+
+export const downvoteAnswer = async (params: AnswerVoteParams) => {
+  try {
+    connectToDB();
+    const { answerId, userId, hasdownVoted, path } = params;
+    let updateQuery = {};
+
+    // if the user has already downvoted the question, remove the downvote
+    if (hasdownVoted) {
+      updateQuery = { $pull: { downvotes: userId } };
+    } else {
+      // if the user has not already downvoted the question, add the downvote and also remove upvote if user has upvoted the question
+      // mongodb doest not throe error when $pull it doest not find the element
+      updateQuery = {
+        $addToSet: {
+          downvotes: userId,
+        },
+        $pull: { upvotes: userId },
+      };
+    }
+
+    const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
+      new: true,
+    });
+
+    if (!answer) {
+      throw new Error("answer not found");
+    }
+
+    // increment the users reputation
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log("Error while upvote answer => ", error);
   }
 };
