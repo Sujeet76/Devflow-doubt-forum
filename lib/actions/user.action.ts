@@ -38,8 +38,6 @@ export async function createUser(userData: CreateUserParams) {
   try {
     connectToDB();
 
-    console.log(userData);
-
     const newUser = await User.create(userData);
 
     return newUser;
@@ -140,7 +138,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     connectToDB();
 
-    const { clerkId, page = 1, pageSize = 10, filter, searchQuery } = params;
+    const { clerkId, page = 1, pageSize = 10, filter = "createdAt", searchQuery } = params;
 
     const query: FilterQuery<typeof Question> = searchQuery
       ? { title: { $regex: new RegExp(searchQuery, "i") } }
@@ -152,7 +150,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
         select: "-content",
         match: query,
         options: {
-          sort: { createdAt: -1 },
+          sort: { [filter]: -1 },
           skip: (page - 1) * pageSize,
         },
         populate: [
@@ -197,7 +195,6 @@ export async function getUserAnswers(params: GetUserStatsParams) {
   try {
     connectToDB();
     const { userId, page = 1, pageSize = 5 } = params;
-    console.log(userId);
     const answers = await Answer.find({
       author: userId,
     })
@@ -220,7 +217,6 @@ export async function getUserQuestions(params: GetUserStatsParams) {
   try {
     connectToDB();
     const { userId, page = 1, pageSize = 5 } = params;
-    console.log(userId);
     const questions = await Question.find({
       author: userId,
     })

@@ -10,7 +10,7 @@ export const connectToDB = async () => {
   if (!process.env.NEXT_PUBLIC_DATABASE_URL)
     return console.log("Mongodb url is missing");
 
-  if (isConnected) return console.log("Already connected to mongodb!!");
+  if (isConnected) return;
 
   try {
     await mongoose.connect(process.env.NEXT_PUBLIC_DATABASE_URL, {

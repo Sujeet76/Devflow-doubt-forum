@@ -87,7 +87,6 @@ export const getQuestionById = async (params: GetQuestionByIdParams) => {
     return question;
   } catch (error) {
     console.log("Error while getting question by id => ", error);
-    throw new Error(`Error while getting question by id => ${error}`);
   }
 };
 

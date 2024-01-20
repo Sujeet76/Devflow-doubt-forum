@@ -108,5 +108,8 @@ export async function POST(req: Request) {
     });
   }
 
-  return new Response("", { status: 201 });
+  // return new Response("", { status: 201 });
+  return NextResponse.json({
+    message: "Ok",
+  })
 }

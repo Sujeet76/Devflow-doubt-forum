@@ -7,9 +7,7 @@ import Interaction from "@/database/interaction.modal";
 
 export const viewQuestion = async (params: ViewQuestionParams) => {
   try {
-    const { userId, questionId } = params;
-    console.log("called");
-    console.log(userId, questionId);
+    const { userId, questionId } = params;;
     connectToDB();
 
     const isQuestion = await Question.findById(questionId);
