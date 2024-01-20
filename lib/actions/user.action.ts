@@ -7,6 +7,8 @@ import {
   DeleteUserParams,
   GetAllUsersParams,
   GetSavedQuestionsParams,
+  GetUserByIdParams,
+  GetUserStatsParams,
   ToggleSaveQuestionParams,
   UpdateUserParams,
 } from "./shared.types";
@@ -14,8 +16,9 @@ import { revalidatePath } from "next/cache";
 import Question from "@/database/question.modal";
 import Tag from "@/database/tag.modal";
 import { FilterQuery } from "mongoose";
+import Answer from "@/database/answer.modal";
 
-export async function getUserById(params: any) {
+export async function getUserById(params: GetUserByIdParams) {
   try {
     connectToDB();
 
@@ -169,6 +172,72 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
     throw new Error("Error while getting saved questions");
   }
 }
+export async function getUserInfo(params: GetUserByIdParams) {
+  try {
+    connectToDB();
+    const { userId } = params;
+
+    const user = await User.findOne({ clerkId: userId });
+    if (!user) throw new Error("User not found");
+
+    const totalQuestion = await Question.countDocuments({ author: user._id });
+    const totalAnswer = await Answer.countDocuments({ author: user._id });
+
+    return {
+      user,
+      totalQuestion,
+      totalAnswer,
+    };
+  } catch (error) {
+    console.log("Error while => ", error);
+  }
+}
+
+export async function getUserAnswers(params: GetUserStatsParams) {
+  try {
+    connectToDB();
+    const { userId, page = 1, pageSize = 5 } = params;
+    console.log(userId);
+    const answers = await Answer.find({
+      author: userId,
+    })
+      .sort({ upvotes: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .populate({
+        path: "author",
+        select: "_id clearId picture name",
+      })
+      .populate({ path: "question", select: "_id title" })
+      .select("-content");
+    return { answers };
+  } catch (error) {
+    console.log("Error while => ", error);
+  }
+}
+
+export async function getUserQuestions(params: GetUserStatsParams) {
+  try {
+    connectToDB();
+    const { userId, page = 1, pageSize = 5 } = params;
+    console.log(userId);
+    const questions = await Question.find({
+      author: userId,
+    })
+      .sort({ views: -1, upvotes: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .populate({
+        path: "author",
+        select: "_id clearId picture name",
+      })
+      .populate({ path: "tags", select: "_id name" });
+    return { questions };
+  } catch (error) {
+    console.log("Error while => ", error);
+  }
+}
+
 // export async function getAllUsers(params: GetAllUsersParams) {
 //   try {
 //     connectToDB();

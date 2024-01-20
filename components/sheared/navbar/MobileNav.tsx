@@ -7,25 +7,33 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
-import { SignedOut } from "@clerk/nextjs";
+import { SignedOut, useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { sidebarLinks } from "@/constants";
 import { usePathname } from "next/navigation";
 
 const NavContent = () => {
   const pathname = usePathname();
+  const { userId } = useAuth();
 
   return (
-    <section className="flex h-full flex-col gap-4 pt-16">
+    <section className='flex h-full flex-col gap-4 pt-16'>
       {sidebarLinks.map((item) => {
         const isActive =
           (pathname.includes(item.route) && item.route.length > 1) ||
           pathname === item.route;
 
         return (
-          <SheetClose asChild key={item.route}>
+          <SheetClose
+            asChild
+            key={item.route}
+          >
             <Link
-              href={item.route}
+              href={
+                item.route === "/profile"
+                  ? `${item.route}/${userId}`
+                  : item.route
+              }
               className={`${
                 isActive
                   ? "primary-gradient rounded-lg text-light-900"
@@ -55,48 +63,51 @@ const MobileNav = () => {
     <Sheet>
       <SheetTrigger asChild>
         <Image
-          src="/assets/icons/hamburger.svg"
+          src='/assets/icons/hamburger.svg'
           width={36}
           height={36}
-          alt="menu"
-          className="invert-colors sm:hidden"
+          alt='menu'
+          className='invert-colors sm:hidden'
         />
       </SheetTrigger>
       <SheetContent
-        side="left"
-        className="background-light900_dark200 border-none"
+        side='left'
+        className='background-light900_dark200 border-none'
       >
-        <Link href="/" className="flex items-center gap-1">
+        <Link
+          href='/'
+          className='flex items-center gap-1'
+        >
           <Image
-            src="/assets/images/site-logo.svg"
+            src='/assets/images/site-logo.svg'
             width={23}
             height={23}
-            alt="DevFlow"
+            alt='DevFlow'
           />
-          <p className="h2-bold text-dark100_light900 font-spaceGrotesk">
-            Dev<span className="text-primary-500">OverFlow</span>{" "}
+          <p className='h2-bold text-dark100_light900 font-spaceGrotesk'>
+            Dev<span className='text-primary-500'>OverFlow</span>{" "}
           </p>
         </Link>
 
-        <div className="no-scrollbar flex h-[calc(100vh-80px)] flex-col justify-between overflow-y-auto">
+        <div className='no-scrollbar flex h-[calc(100vh-80px)] flex-col justify-between overflow-y-auto'>
           <SheetClose asChild>
             <NavContent />
           </SheetClose>
 
           <SignedOut>
-            <div className="flex flex-col gap-3">
+            <div className='flex flex-col gap-3'>
               <SheetClose asChild>
-                <Link href="/sign-in">
-                  <Button className="small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
-                    <span className="primary-text-gradient font-medium">
+                <Link href='/sign-in'>
+                  <Button className='small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none'>
+                    <span className='primary-text-gradient font-medium'>
                       Log In
                     </span>
                   </Button>
                 </Link>
               </SheetClose>
               <SheetClose asChild>
-                <Link href="/sign-up">
-                  <Button className="small-medium light-border-2 btn-tertiary text-dark400_light900 min-h-[41px] w-full rounded-lg px-4 py-3">
+                <Link href='/sign-up'>
+                  <Button className='small-medium light-border-2 btn-tertiary text-dark400_light900 min-h-[41px] w-full rounded-lg px-4 py-3'>
                     Sign Up
                   </Button>
                 </Link>
