@@ -86,6 +86,7 @@ export const formatNumber = (num: number): string => {
 };
 
 export function getJoinedDate(date: Date): string {
-  const options = { year: "numeric", month: "long" };
-  return date.toLocaleDateString(undefined, options);
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
+  return `${month} ${year}`;
 }
