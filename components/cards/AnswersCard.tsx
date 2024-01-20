@@ -2,15 +2,19 @@
 import Link from "next/link";
 import Metric from "../sheared/Metric";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
+import { SignedIn } from "@clerk/nextjs";
+import EditDeleteAction from "../sheared/EditDeleteAction";
 
-interface QuestionProps {
+interface AnswerProps {
   _id: string;
   answer_Id: string;
+  clerkId?: string;
   title: string;
   author: {
     _id: string;
     name: string;
     picture: string;
+    clerkId?: string;
   };
   upvotes: number;
   createdAt: Date;
@@ -18,13 +22,15 @@ interface QuestionProps {
 
 const AnswerCard = ({
   _id,
+  answer_Id,
+  clerkId,
   title,
   author,
   upvotes,
   createdAt,
-  // eslint-disable-next-line camelcase
-  answer_Id,
-}: QuestionProps) => {
+}: AnswerProps) => {
+  const showActionButtons = clerkId && clerkId === author?.clerkId;
+
   return (
     <div className='card-wrapper rounded-[10px] p-9 sm:px-11'>
       <div className='flex flex-col-reverse items-start justify-between gap-5 sm:flex-row'>
@@ -38,6 +44,14 @@ const AnswerCard = ({
             </h3>
           </Link>
         </div>
+        <SignedIn>
+          {showActionButtons && (
+            <EditDeleteAction
+              type='answer'
+              itemId={JSON.stringify(_id)}
+            />
+          )}
+        </SignedIn>
       </div>
 
       {/* flex-between(not tailwind class) -> flex justify-between items-center (refer to globals.css) */}

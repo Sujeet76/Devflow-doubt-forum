@@ -8,9 +8,13 @@ import {
   GetQuestionByIdParams,
   GetQuestionsParams,
   QuestionVoteParams,
+  DeleteQuestionParams,
+  EditQuestionParams,
 } from "./shared.types";
 import User from "@/database/user.modal";
 import { revalidatePath } from "next/cache";
+import Answer from "@/database/answer.modal";
+import Interaction from "@/database/interaction.modal";
 
 export const getQuestions = async (params: GetQuestionsParams) => {
   try {
@@ -159,5 +163,61 @@ export const downvoteQuestion = async (params: QuestionVoteParams) => {
     revalidatePath(path);
   } catch (error) {
     console.log("Error while upvote => ", error);
+  }
+};
+
+export const deleteQuestion = async (params: DeleteQuestionParams) => {
+  try {
+    // delete the question
+    // delete also related questions
+
+    connectToDB();
+
+    const { questionId, path } = params;
+    const isQuestionExist = await Question.findById(questionId);
+    if (!isQuestionExist) {
+      throw new Error("Question not found");
+    }
+
+    // delete the tags
+    await Tag.updateMany(
+      { questions: questionId },
+      { $pull: { questions: questionId } }
+    );
+
+    // delete the answer
+    await Answer.deleteMany({ question: questionId });
+
+    // delete the question
+    await Question.deleteOne({ _id: isQuestionExist._id });
+
+    // delete the interaction
+    await Interaction.deleteMany({ question: questionId });
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log("Error while deleting question => ", error);
+  }
+};
+
+export const editQuestion = async (params: EditQuestionParams) => {
+  try {
+    connectToDB();
+
+    const { title, content, questionId, path } = params;
+
+    const isQuestionExist = await Question.findById(questionId);
+    if (!isQuestionExist) {
+      throw new Error("Question not found");
+    }
+
+    isQuestionExist.title = title;
+    isQuestionExist.content = content;
+
+    await isQuestionExist.save();
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(`Error while editing question => ${error}`);
   }
 };

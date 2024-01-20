@@ -1,7 +1,9 @@
 {
   "cSpell.words": [
+    "advlist",
     "aspnet",
     "camelcase",
+    "charmap",
     "clsx",
     "darkgradient",
     "darknone",
@@ -15,11 +17,22 @@
     "nextjs",
     "npsb",
     "prismjs",
+    "searchreplace",
     "svix",
     "tailwindcss",
     "tinymce",
     "upvote",
     "upvoted",
-    "Upvotes"
+    "Upvotes",
+    "visualblocks",
+    "codesample",
+    "insertdatetime",
+    "forecolor",
+    "alignleft",
+    "aligncenter",
+    "alignright",
+    "bullist",
+    "numlist",
+    "alignjustify"
   ]
 }

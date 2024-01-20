@@ -138,7 +138,13 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     connectToDB();
 
-    const { clerkId, page = 1, pageSize = 10, filter = "createdAt", searchQuery } = params;
+    const {
+      clerkId,
+      page = 1,
+      pageSize = 10,
+      filter = "createdAt",
+      searchQuery,
+    } = params;
 
     const query: FilterQuery<typeof Question> = searchQuery
       ? { title: { $regex: new RegExp(searchQuery, "i") } }
@@ -203,7 +209,7 @@ export async function getUserAnswers(params: GetUserStatsParams) {
       .limit(pageSize)
       .populate({
         path: "author",
-        select: "_id clearId picture name",
+        select: "_id clerkId picture name",
       })
       .populate({ path: "question", select: "_id title" })
       .select("-content");
@@ -225,7 +231,7 @@ export async function getUserQuestions(params: GetUserStatsParams) {
       .limit(pageSize)
       .populate({
         path: "author",
-        select: "_id clearId picture name",
+        select: "_id clerkId picture name",
       })
       .populate({ path: "tags", select: "_id name" });
     return { questions };
