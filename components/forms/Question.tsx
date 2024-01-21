@@ -151,7 +151,7 @@ const QuestionForm = ({
             render={({ field }) => (
               <FormItem className='flex w-full flex-col'>
                 <FormLabel className='paragraph-semibold text-dark400_light800'>
-                  Question Title <sup className='text-primary-500'>*</sup>
+                  Question Title <sup className='text-rose-600'>*</sup>
                 </FormLabel>
                 <FormControl className='mt-3.5'>
                   <Input
