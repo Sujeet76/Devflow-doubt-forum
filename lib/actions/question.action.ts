@@ -221,3 +221,18 @@ export const editQuestion = async (params: EditQuestionParams) => {
     console.log(`Error while editing question => ${error}`);
   }
 };
+
+export const getTopQuestions = async () => {
+  try {
+    connectToDB();
+    const questions = await Question.find({})
+      .sort({ views: -1, upvotes: -1 })
+      .limit(5)
+      .select("_id title");
+    if (!questions) throw new Error("Error while fetching top questions");
+
+    return questions;
+  } catch (error) {
+    console.log("Error while fetching question(s) => ", error);
+  }
+};

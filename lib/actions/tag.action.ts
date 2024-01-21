@@ -93,3 +93,29 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
     console.log("Error while => ", error);
   }
 }
+
+export async function getTopTags() {
+  try {
+    connectToDB();
+
+    const tags = await Tag.aggregate([
+      {
+        $project: {
+          name: 1,
+          _id: 1,
+          totalQuestion: { $size: "$questions" },
+        },
+      },
+      {
+        $sort: { totalQuestion: -1 },
+      },
+      { $limit: 5 },
+    ]);
+
+    if (!tags) throw new Error("No tags found(error while finding tags");
+
+    return tags;
+  } catch (error) {
+    console.log("Error while getting top tags ", error);
+  }
+}
