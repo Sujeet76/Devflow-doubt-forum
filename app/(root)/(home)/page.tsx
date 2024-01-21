@@ -6,10 +6,13 @@ import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import { QuestionFilters } from "@/constants/filters";
 import { getQuestions } from "@/lib/actions/question.action";
+import { SearchParamsProps } from "@/types";
 import Link from "next/link";
 
-export default async function Home() {
-  const result = await getQuestions({});
+export default async function Home({ searchParams }: SearchParamsProps) {
+  const result = await getQuestions({
+    searchQuery: searchParams?.q,
+  });
 
   return (
     <>
@@ -27,6 +30,7 @@ export default async function Home() {
         </div>
         <div className='mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
           <LocalSearch
+            route='/'
             icon='/assets/icons/search.svg'
             placeholder='Search for Questions Here...'
             iconPosition='left'

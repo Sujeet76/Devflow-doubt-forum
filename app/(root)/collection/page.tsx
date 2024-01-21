@@ -4,13 +4,15 @@ import NoResult from "@/components/sheared/NoResult";
 import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestions } from "@/lib/actions/user.action";
+import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs";
 
-export default async function Collection() {
+export default async function Collection({ searchParams }: SearchParamsProps) {
   const { userId } = auth();
   if (!userId) return null;
   const result = await getSavedQuestions({
     clerkId: userId,
+    searchQuery: searchParams?.q,
   });
 
   return (
@@ -18,6 +20,7 @@ export default async function Collection() {
       <h1 className='h1-bold text-dark100_light900'>Saved Question</h1>
       <div className='mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
         <LocalSearch
+          route='/collection'
           icon='/assets/icons/search.svg'
           placeholder='Search for Questions Here...'
           iconPosition='left'

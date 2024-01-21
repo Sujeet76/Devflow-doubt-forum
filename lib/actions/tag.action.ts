@@ -37,9 +37,16 @@ export async function getAllTags(params: GetAllTagsParams) {
   try {
     connectToDB();
 
-    // const { page = 1, pageSize = 20, filter, searchQuery } = params;
+    const { page = 1, pageSize = 20, searchQuery } = params;
+    const query: FilterQuery<typeof Tag> = {};
+    if (searchQuery) {
+      query.name = { $regex: new RegExp(searchQuery, "i") };
+    }
 
-    const tags = await Tag.find({}).sort({ createdAt: -1 });
+    const tags = await Tag.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
 
     // find interaction for the user and group by tag...
     // Interaction...
@@ -56,9 +63,14 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
 
     const { tagId, page = 1, pageSize = 10, searchQuery } = params;
 
-    const query: FilterQuery<typeof Question> = searchQuery
-      ? { $regex: new RegExp(searchQuery, "i") }
-      : {};
+    const query: FilterQuery<typeof Question> = {};
+
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, "i") } },
+        { content: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
 
     const questions = await Tag.findById(tagId).populate({
       path: "questions",

@@ -9,6 +9,7 @@ import { URLProps } from "@/types";
 const Tag = async (prop: URLProps) => {
   const result = await getQuestionsByTagId({
     tagId: prop.params.id,
+    searchQuery: prop.searchParams?.q,
   });
 
   return (
@@ -18,6 +19,7 @@ const Tag = async (prop: URLProps) => {
       </h1>
       <div className='mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
         <LocalSearch
+          route={`/tags/${prop.params.id}`}
           icon='/assets/icons/search.svg'
           placeholder='Search for tag Questions Here...'
           iconPosition='left'

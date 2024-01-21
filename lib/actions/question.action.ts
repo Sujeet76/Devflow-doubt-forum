@@ -15,12 +15,22 @@ import User from "@/database/user.modal";
 import { revalidatePath } from "next/cache";
 import Answer from "@/database/answer.modal";
 import Interaction from "@/database/interaction.modal";
+import { FilterQuery } from "mongoose";
 
 export const getQuestions = async (params: GetQuestionsParams) => {
   try {
     connectToDB();
+    const { searchQuery } = params;
 
-    const questions = await Question.find({})
+    const query: FilterQuery<typeof Question> = {};
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, "i") } },
+        { content: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
+
+    const questions = await Question.find(query)
       .populate({
         path: "tags",
         model: Tag,

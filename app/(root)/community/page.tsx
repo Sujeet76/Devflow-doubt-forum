@@ -4,12 +4,15 @@ import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { UserFilters } from "@/constants/filters";
 import { getAllUsers } from "@/lib/actions/user.action";
 import Link from "next/link";
+import { SearchParamsProps } from "@/types";
 
-const page = async () => {
+const page = async ({ searchParams }: SearchParamsProps) => {
   let result;
 
   try {
-    result = await getAllUsers({});
+    result = await getAllUsers({
+      searchQuery: searchParams?.q,
+    });
   } catch (err) {
     console.log(err);
   }
@@ -20,6 +23,7 @@ const page = async () => {
         <h1 className='h1-bold text-dark100_light900'>All Users</h1>
         <div className='mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
           <LocalSearch
+            route='/community'
             icon='/assets/icons/search.svg'
             placeholder='Search by username...'
             iconPosition='left'
