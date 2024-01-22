@@ -72,7 +72,11 @@ export const getQuestions = async (params: GetQuestionsParams) => {
       .sort(sortOptions)
       .skip((page - 1) * pageSize)
       .limit(pageSize);
-    return { questions };
+
+    const totalDocuments = await Question.countDocuments(query);
+    const isNext = totalDocuments > (page - 1) * pageSize + questions.length;
+
+    return { questions, isNext };
   } catch (error) {
     console.log("Error while fetching question(s) => ", error);
   }

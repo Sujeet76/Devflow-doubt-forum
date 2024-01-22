@@ -153,7 +153,10 @@ export async function getAllUsers(params: GetAllUsersParams) {
       .skip((page - 1) * pageSize)
       .limit(pageSize);
 
-    return { users };
+    const totalDocuments = await User.countDocuments(query);
+    const isNext = totalDocuments > (page - 1) * pageSize + users.length;
+
+    return { users, isNext };
   } catch (error) {
     console.log("Error while getting all users => ", error);
     throw new Error("Error while getting all users");
@@ -165,6 +168,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
     connectToDB();
 
     const { clerkId, page = 1, pageSize = 10, filter, searchQuery } = params;
+    console.log(page, pageSize);
 
     const query: FilterQuery<typeof Question> = {};
     if (searchQuery) {
@@ -202,6 +206,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
         options: {
           sort: sortOption,
           skip: (page - 1) * pageSize,
+          limit: pageSize,
         },
         populate: [
           { path: "author", model: User, select: "_id clerkId name picture" },
@@ -210,11 +215,20 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       })
       .select("_id clerkId");
 
+    const totalDocuments = await User.findOne({ clerkId }).populate({
+      path: "saved",
+      match: query,
+    });
+    console.log(totalDocuments.saved.length);
+    const isNext =
+      totalDocuments.saved.length >
+      (page - 1) * pageSize + savedQuestion.saved.length;
+
     if (!savedQuestion) {
       throw new Error("No saved question found");
     }
 
-    return savedQuestion;
+    return { savedQuestion, isNext };
   } catch (error) {
     console.log("Error while => ", error);
   }
@@ -256,7 +270,11 @@ export async function getUserAnswers(params: GetUserStatsParams) {
       })
       .populate({ path: "question", select: "_id title" })
       .select("-content");
-    return { answers };
+
+    const totalDocument = await Question.countDocuments({ author: userId });
+    const isNext = totalDocument > (page - 1) * pageSize + answers.length;
+
+    return { answers, isNext };
   } catch (error) {
     console.log("Error while => ", error);
   }
@@ -277,7 +295,11 @@ export async function getUserQuestions(params: GetUserStatsParams) {
         select: "_id clerkId picture name",
       })
       .populate({ path: "tags", select: "_id name" });
-    return { questions };
+
+    const totalDocuments = await Question.countDocuments({ author: userId });
+    const isNext = totalDocuments > (page - 1) * pageSize + questions.length;
+
+    return { questions, isNext };
   } catch (error) {
     console.log("Error while => ", error);
   }

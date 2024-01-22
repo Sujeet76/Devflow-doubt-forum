@@ -84,10 +84,13 @@ export async function getAllTags(params: GetAllTagsParams) {
       ]);
     }
 
+    const totalDocuments = await Tag.countDocuments(query);
+    const isNext = totalDocuments > (page - 1) * pageSize + tags.length;
+
     // find interaction for the user and group by tag...
     // Interaction...
 
-    return { tags };
+    return { tags, isNext };
   } catch (error) {
     console.error("Error while fetching tags:", error);
   }
@@ -157,7 +160,16 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
       throw Error("No question found");
     }
 
-    return { title: questions.name, questions: questions?.questions };
+    const totalDocuments = await Tag.findById(tagId).populate({
+      path: "questions",
+      model: Question,
+      match: query,
+    });
+    const isNext =
+      totalDocuments.questions.length >
+      (page - 1) * pageSize + questions.length;
+
+    return { title: questions.name, questions: questions?.questions, isNext };
   } catch (error) {
     console.log("Error while => ", error);
   }

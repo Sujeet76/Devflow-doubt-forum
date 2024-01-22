@@ -2,6 +2,7 @@ import QuestionCard from "@/components/cards/QuestionCard";
 import HomeFilters from "@/components/home/HomeFilters";
 import Filters from "@/components/sheared/Filters";
 import NoResult from "@/components/sheared/NoResult";
+import Pagination from "@/components/sheared/Pagination";
 import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import { QuestionFilters } from "@/constants/filters";
@@ -13,6 +14,8 @@ export default async function Home({ searchParams }: SearchParamsProps) {
   const result = await getQuestions({
     searchQuery: searchParams?.q,
     filter: searchParams?.filter,
+    page: searchParams.page ? +searchParams.page : 1,
+    pageSize: searchParams.pageSize ? +searchParams.pageSize : 20,
   });
 
   return (
@@ -72,6 +75,14 @@ export default async function Home({ searchParams }: SearchParamsProps) {
           />
         )}
       </div>
+
+      {/* pagination */}
+      {result && result?.questions.length > 0 && (
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result?.isNext}
+        />
+      )}
     </>
   );
 }

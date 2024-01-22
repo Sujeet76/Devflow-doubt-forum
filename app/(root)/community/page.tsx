@@ -5,6 +5,7 @@ import { UserFilters } from "@/constants/filters";
 import { getAllUsers } from "@/lib/actions/user.action";
 import Link from "next/link";
 import { SearchParamsProps } from "@/types";
+import Pagination from "@/components/sheared/Pagination";
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   let result;
@@ -13,6 +14,8 @@ const page = async ({ searchParams }: SearchParamsProps) => {
     result = await getAllUsers({
       searchQuery: searchParams?.q,
       filter: searchParams?.filter,
+      page: searchParams.page ? +searchParams.page : 1,
+      pageSize: searchParams.pageSize ? +searchParams.pageSize : 20,
     });
   } catch (err) {
     console.log(err);
@@ -56,6 +59,14 @@ const page = async ({ searchParams }: SearchParamsProps) => {
           </div>
         )}
       </section>
+
+      {/* pagination */}
+      {result && result?.users.length > 0 && (
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result?.isNext}
+        />
+      )}
     </>
   );
 };

@@ -1,6 +1,7 @@
 import QuestionCard from "@/components/cards/QuestionCard";
 import Filters from "@/components/sheared/Filters";
 import NoResult from "@/components/sheared/NoResult";
+import Pagination from "@/components/sheared/Pagination";
 import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestions } from "@/lib/actions/user.action";
@@ -14,6 +15,8 @@ export default async function Collection({ searchParams }: SearchParamsProps) {
     clerkId: userId,
     searchQuery: searchParams?.q,
     filter: searchParams?.filter,
+    page: searchParams.page ? +searchParams.page : 1,
+    pageSize: searchParams.pageSize ? +searchParams.pageSize : 20,
   });
 
   return (
@@ -35,8 +38,8 @@ export default async function Collection({ searchParams }: SearchParamsProps) {
 
       {/* card component */}
       <div className='mt-10 flex w-full flex-col gap-6'>
-        {result && result?.saved?.length > 0 ? (
-          result.saved.map((question: any) => (
+        {result && result?.savedQuestion?.saved?.length > 0 ? (
+          result?.savedQuestion.saved.map((question: any) => (
             <QuestionCard
               key={question._id}
               _id={question._id}
@@ -60,6 +63,14 @@ export default async function Collection({ searchParams }: SearchParamsProps) {
           />
         )}
       </div>
+
+      {/* pagination */}
+      {result && result?.savedQuestion.saved.length > 0 && (
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result?.isNext}
+        />
+      )}
     </>
   );
 }

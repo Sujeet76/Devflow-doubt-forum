@@ -1,6 +1,7 @@
 import QuestionCard from "@/components/cards/QuestionCard";
 import Filters from "@/components/sheared/Filters";
 import NoResult from "@/components/sheared/NoResult";
+import Pagination from "@/components/sheared/Pagination";
 import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { QuestionFilters } from "@/constants/filters";
 import { getQuestionsByTagId } from "@/lib/actions/tag.action";
@@ -11,6 +12,8 @@ const Tag = async (prop: URLProps) => {
     tagId: prop.params.id,
     searchQuery: prop.searchParams?.q,
     filter: prop.searchParams?.filter,
+    page: prop.searchParams.page ? +prop.searchParams.page : 1,
+    pageSize: prop.searchParams.pageSize ? +prop.searchParams.pageSize : 20,
   });
 
   return (
@@ -59,6 +62,13 @@ const Tag = async (prop: URLProps) => {
           />
         )}
       </div>
+      {/* pagination */}
+      {result && result?.questions.length > 0 && (
+        <Pagination
+          pageNumber={prop.searchParams?.page ? +prop.searchParams.page : 1}
+          isNext={result?.isNext}
+        />
+      )}
     </>
   );
 };

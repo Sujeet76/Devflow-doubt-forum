@@ -1,4 +1,5 @@
 import Filters from "@/components/sheared/Filters";
+import Pagination from "@/components/sheared/Pagination";
 import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { TagFilters } from "@/constants/filters";
 import { getAllTags } from "@/lib/actions/tag.action";
@@ -9,6 +10,8 @@ const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllTags({
     searchQuery: searchParams?.q,
     filter: searchParams?.filter,
+    page: searchParams.page ? +searchParams.page : 1,
+    pageSize: searchParams.pageSize ? +searchParams.pageSize : 20,
   });
 
   return (
@@ -63,6 +66,14 @@ const page = async ({ searchParams }: SearchParamsProps) => {
           </div>
         )}
       </section>
+
+      {/* pagination */}
+      {result && result?.tags.length > 0 && (
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result?.isNext}
+        />
+      )}
     </>
   );
 };
