@@ -123,7 +123,7 @@ export async function deleteUser(params: DeleteUserParams) {
 export async function getAllUsers(params: GetAllUsersParams) {
   try {
     connectToDB();
-    const { page = 1, pageSize = 20, searchQuery } = params;
+    const { page = 1, pageSize = 20, searchQuery, filter } = params;
 
     const query: FilterQuery<typeof User> = {};
     if (searchQuery) {
@@ -133,8 +133,23 @@ export async function getAllUsers(params: GetAllUsersParams) {
       ];
     }
 
+    let sortOptions = {};
+    switch (filter) {
+      case "new_users":
+        sortOptions = { joinedAt: -1 };
+        break;
+      case "old_users":
+        sortOptions = { joinedAt: 1 };
+        break;
+      case "top_contributors":
+        sortOptions = { reputation: -1 };
+        break;
+      default:
+        break;
+    }
+
     const users = await User.find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortOptions)
       .skip((page - 1) * pageSize)
       .limit(pageSize);
 
@@ -149,13 +164,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     connectToDB();
 
-    const {
-      clerkId,
-      page = 1,
-      pageSize = 10,
-      filter = "createdAt",
-      searchQuery,
-    } = params;
+    const { clerkId, page = 1, pageSize = 10, filter, searchQuery } = params;
 
     const query: FilterQuery<typeof Question> = {};
     if (searchQuery) {
@@ -165,13 +174,33 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       ];
     }
 
+    let sortOption = {};
+
+    switch (filter) {
+      case "most_recent":
+        sortOption = { createdAt: -1 };
+        break;
+      case "oldest":
+        sortOption = { createdAt: 1 };
+        break;
+      case "most_voted":
+        sortOption = { upvotes: -1 };
+        break;
+      case "most_viewed":
+        sortOption = { views: -1 };
+        break;
+      case "most_answered":
+        sortOption = { answers: -1 };
+        break;
+    }
+
     const savedQuestion = await User.findOne({ clerkId })
       .populate({
         path: "saved",
         select: "-content",
         match: query,
         options: {
-          sort: { [filter]: -1 },
+          sort: sortOption,
           skip: (page - 1) * pageSize,
         },
         populate: [
@@ -188,7 +217,6 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
     return savedQuestion;
   } catch (error) {
     console.log("Error while => ", error);
-    throw new Error("Error while getting saved questions");
   }
 }
 export async function getUserInfo(params: GetUserByIdParams) {

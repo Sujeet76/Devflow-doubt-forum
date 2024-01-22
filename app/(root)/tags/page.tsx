@@ -8,6 +8,7 @@ import Link from "next/link";
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllTags({
     searchQuery: searchParams?.q,
+    filter: searchParams?.filter,
   });
 
   return (
@@ -37,13 +38,13 @@ const page = async ({ searchParams }: SearchParamsProps) => {
             >
               <article className='background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border px-8 py-10'>
                 <div className='background-light800_dark400 w-fit rounded-sm px-5 py-1.5'>
-                  <p className='paragraph-semibold text-dark300_light900'>
+                  <p className='paragraph-semibold text-dark300_light900 uppercase'>
                     {tag.name}
                   </p>
                 </div>
                 <p className='small-medium text-dark400_light500 mt-3.5'>
                   <span className='body-semibold primary-text-gradient mr-2.5'>
-                    {tag.questions.length}+
+                    {tag.totalQuestions}+
                   </span>
                   Question(s)
                 </p>

@@ -12,6 +12,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
   try {
     result = await getAllUsers({
       searchQuery: searchParams?.q,
+      filter: searchParams?.filter,
     });
   } catch (err) {
     console.log(err);

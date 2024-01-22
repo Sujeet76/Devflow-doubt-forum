@@ -10,6 +10,7 @@ const Tag = async (prop: URLProps) => {
   const result = await getQuestionsByTagId({
     tagId: prop.params.id,
     searchQuery: prop.searchParams?.q,
+    filter: prop.searchParams?.filter,
   });
 
   return (

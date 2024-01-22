@@ -20,7 +20,7 @@ import { FilterQuery } from "mongoose";
 export const getQuestions = async (params: GetQuestionsParams) => {
   try {
     connectToDB();
-    const { searchQuery } = params;
+    const { searchQuery, filter, page = 1, pageSize = 10 } = params;
 
     const query: FilterQuery<typeof Question> = {};
     if (searchQuery) {
@@ -28,6 +28,36 @@ export const getQuestions = async (params: GetQuestionsParams) => {
         { title: { $regex: new RegExp(searchQuery, "i") } },
         { content: { $regex: new RegExp(searchQuery, "i") } },
       ];
+    }
+
+    let sortOptions = {};
+    switch (filter) {
+      case "newest":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "most_recent":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "oldest":
+        sortOptions = { createdAt: 1 };
+        break;
+      case "frequent":
+        sortOptions = { views: -1 };
+        break;
+      case "most_viewed":
+        sortOptions = { views: -1 };
+        break;
+      case "unanswered":
+        query.answers = { $size: 0 };
+        break;
+      case "most_voted":
+        sortOptions = { upvotes: -1 };
+        break;
+      case "most_answered":
+        sortOptions = { answers: -1 };
+        break;
+      default:
+        break;
     }
 
     const questions = await Question.find(query)
@@ -39,7 +69,9 @@ export const getQuestions = async (params: GetQuestionsParams) => {
         path: "author",
         model: User,
       })
-      .sort({ createdAt: -1 });
+      .sort(sortOptions)
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
     return { questions };
   } catch (error) {
     console.log("Error while fetching question(s) => ", error);
@@ -58,19 +90,35 @@ export const createQuestion = async (params: CreateQuestionParams) => {
       author,
     });
 
-    const tagDocument = [];
+    const bulkOps = tags.map((tag) => ({
+      updateOne: {
+        filter: {
+          name: {
+            $regex: new RegExp(
+              `^${tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+              "i"
+            ),
+          },
+        },
+        update: {
+          $setOnInsert: {
+            name: tag,
+            createdAt: new Date(),
+          },
+          $push: { questions: question._id },
+        },
+        upsert: true,
+      },
+    }));
 
-    for (const tag of tags) {
-      const existingTag = await Tag.findOneAndUpdate(
-        { name: { $regex: new RegExp(`^${tag}$`, "i") } },
-        { $setOnInsert: { name: tag }, $push: { questions: question._id } },
-        { upsert: true, new: true }
-      );
+    await Tag.bulkWrite(bulkOps);
 
-      tagDocument.push(existingTag._id);
-    }
+    const tagDocuments = await Tag.find({
+      name: { $in: tags },
+    });
+
     await Question.findByIdAndUpdate(question._id, {
-      $push: { tags: { $each: tagDocument } },
+      $push: { tags: { $each: tagDocuments.map((tag) => tag._id) } },
     });
 
     // create an interaction record for the user's ask_question action
