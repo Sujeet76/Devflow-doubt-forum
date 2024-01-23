@@ -11,6 +11,7 @@ import ProfileLink from "@/components/sheared/ProfileLink";
 import Stats from "@/components/sheared/Stats";
 import QuestionTab from "@/components/sheared/QuestionTab";
 import AnswerTab from "@/components/sheared/AnswerTab";
+import NoResult from "@/components/sheared/NoResult";
 
 const Profile = async ({ params, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
@@ -18,6 +19,16 @@ const Profile = async ({ params, searchParams }: URLProps) => {
   const userInfo = await getUserInfo({
     userId: id,
   });
+
+  if (!userInfo) {
+    <NoResult
+      title='User not found 🥹😥'
+      description={`Be the first to break the silence! 🚀 Ask a Question and kickstart the
+            discussion.By registering to our platform💡`}
+      link='/sign-up'
+      linkTitle='Get stared with us'
+    />;
+  }
 
   return (
     <>
@@ -76,8 +87,10 @@ const Profile = async ({ params, searchParams }: URLProps) => {
         </div>
       </div>
       <Stats
-        totalQuestion={userInfo?.totalQuestion ?? 0}
-        totalAnswer={userInfo?.totalAnswer ?? 0}
+        totalQuestion={userInfo?.totalQuestions ?? 0}
+        totalAnswer={userInfo?.totalAnswers ?? 0}
+        badges={userInfo?.badgeCounts}
+        reputation={userInfo?.reputation | 0}
       />
       <div className='mt-10 flex gap-10'>
         <Tabs
@@ -103,7 +116,7 @@ const Profile = async ({ params, searchParams }: URLProps) => {
               searchParams={searchParams}
               userId={userInfo?.user._id}
               clerkId={userInfo?.user.clerkId}
-              totalQuestion={userInfo?.totalQuestion ?? 0}
+              totalQuestion={userInfo?.totalQuestions ?? 0}
             />
           </TabsContent>
           <TabsContent value='answer'>
@@ -111,7 +124,7 @@ const Profile = async ({ params, searchParams }: URLProps) => {
               searchParams={searchParams}
               userId={userInfo?.user._id}
               clerkId={userInfo?.user.clerkId}
-              totalAnswer={userInfo?.totalAnswer ?? 0}
+              totalAnswer={userInfo?.totalAnswers ?? 0}
             />
           </TabsContent>
         </Tabs>

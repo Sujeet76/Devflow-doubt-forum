@@ -17,6 +17,8 @@ import Question from "@/database/question.modal";
 import Tag from "@/database/tag.modal";
 import { FilterQuery } from "mongoose";
 import Answer from "@/database/answer.modal";
+import { BadgeCriteriaType } from "@/types";
+import { assignBadges } from "../utils";
 
 export async function getUserById(params: GetUserByIdParams) {
   try {
@@ -233,24 +235,109 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
     console.log("Error while => ", error);
   }
 }
+
 export async function getUserInfo(params: GetUserByIdParams) {
   try {
     connectToDB();
+
     const { userId } = params;
 
     const user = await User.findOne({ clerkId: userId });
-    if (!user) throw new Error("User not found");
 
-    const totalQuestion = await Question.countDocuments({ author: user._id });
-    const totalAnswer = await Answer.countDocuments({ author: user._id });
+    if (!user) {
+      throw new Error("❌🔍 User not found 🔍❌");
+    }
+
+    const totalQuestions = await Question.countDocuments({
+      author: user._id,
+    });
+    const totalAnswers = await Answer.countDocuments({
+      author: user._id,
+    });
+
+    // Total upvotes
+    const [questionUpvotes] = await Question.aggregate([
+      { $match: { author: user._id } },
+      {
+        $project: {
+          _id: 0,
+          upvotes: { $size: "$upvotes" },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalUpvotes: { $sum: "$upvotes" },
+        },
+      },
+    ]);
+    const [answerUpvotes] = await Answer.aggregate([
+      { $match: { author: user._id } },
+      {
+        $project: {
+          _id: 0,
+          upvotes: { $size: "$upvotes" },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalUpvotes: { $sum: "$upvotes" },
+        },
+      },
+    ]);
+
+    // Views
+    const [questionViews] = await Question.aggregate([
+      { $match: { author: user._id } },
+      {
+        $group: {
+          _id: null,
+          totalViews: { $sum: "$views" },
+        },
+      },
+    ]);
+
+    /**
+     * Badge system
+     */
+    // Criteria
+    const criteria = [
+      {
+        type: "QUESTION_COUNT" as BadgeCriteriaType,
+        count: totalQuestions,
+      },
+      {
+        type: "ANSWER_COUNT" as BadgeCriteriaType,
+        count: totalAnswers,
+      },
+      {
+        type: "QUESTION_UPVOTES" as BadgeCriteriaType,
+        count: questionUpvotes?.totalUpvotes || 0,
+      },
+      {
+        type: "ANSWER_UPVOTES" as BadgeCriteriaType,
+        count: answerUpvotes?.totalUpvotes || 0,
+      },
+      {
+        type: "TOTAL_VIEWS" as BadgeCriteriaType,
+        count: questionViews?.totalViews || 0,
+      },
+    ];
+
+    // Badge counts
+    const badgeCounts = assignBadges({ criteria });
 
     return {
       user,
-      totalQuestion,
-      totalAnswer,
+      totalQuestions,
+      totalAnswers,
+      badgeCounts,
+      reputation: user.reputation,
     };
   } catch (error) {
-    console.log("Error while => ", error);
+    console.error(`❌ ${error} ❌`);
+    // throw error;
   }
 }
 

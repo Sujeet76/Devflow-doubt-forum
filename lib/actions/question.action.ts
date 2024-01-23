@@ -126,7 +126,15 @@ export const createQuestion = async (params: CreateQuestionParams) => {
     });
 
     // create an interaction record for the user's ask_question action
+    await Interaction.create({
+      user: author,
+      action: "ask_question",
+      question: question._id,
+      tags: tagDocuments.map((tag) => tag._id),
+    });
+
     // Increment author's reputation by +5 for creating a question
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
 
     // revalidatePath => to eliminate the refresh the page
     revalidatePath(path);
@@ -184,7 +192,15 @@ export const upvoteQuestion = async (params: QuestionVoteParams) => {
       throw new Error("Question not found");
     }
 
-    // increment the users reputation
+    // Increment or decrement user reputation by +1/-1 for receiving  upvote/downvote to the questions
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -1 : 1 },
+    });
+
+    // Increment or decrement author reputation by +10/-10 for receiving  upvote/downvote to the questions
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {
@@ -220,7 +236,15 @@ export const downvoteQuestion = async (params: QuestionVoteParams) => {
       throw new Error("Question not found");
     }
 
-    // increment the users reputation
+    // Increment or decrement user reputation by +1/-1 for receiving  upvote/downvote to the questions
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasdownVoted ? -1 : 1 },
+    });
+
+    // Increment or decrement author reputation by +10/-10 for receiving  upvote/downvote to the questions
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasdownVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {
@@ -288,7 +312,7 @@ export const getTopQuestions = async () => {
   try {
     connectToDB();
     const questions = await Question.find({})
-      .sort({ views: -1, upvotes: -1 })
+      .sort({ createdAt: -1, views: -1, upvotes: -1 })
       .limit(5)
       .select("_id title");
     if (!questions) throw new Error("Error while fetching top questions");

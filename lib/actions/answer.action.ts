@@ -11,6 +11,7 @@ import {
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.modal";
 import Interaction from "@/database/interaction.modal";
+import User from "@/database/user.modal";
 
 export async function createAnswer(params: CreateAnswerParams) {
   try {
@@ -21,11 +22,20 @@ export async function createAnswer(params: CreateAnswerParams) {
     const newAnswer = await Answer.create({ content, author, question });
 
     // add the answer to question's answer array
-    await Question.findByIdAndUpdate(question, {
+    const updatedQuestion = await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id },
     });
 
     // TODO: Add interaction...
+    await Interaction.create({
+      user: author,
+      action: "answer",
+      question,
+      answer: newAnswer._id,
+      tags: updatedQuestion.tags,
+    });
+
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 10 } });
 
     revalidatePath(path);
   } catch (error) {
@@ -57,7 +67,7 @@ export const upvoteAnswer = async (params: AnswerVoteParams) => {
       updateQuery = { $pull: { upvotes: userId } };
     } else {
       // if the user has not already upvoted the question, add the upvote and also remove downvote if user has already downvoted the question
-      // mongodb doest not throe error when $pull it doest not find the element
+      // mongodb doest not throw error when $pull it doest not find the element
       updateQuery = {
         $addToSet: {
           upvotes: userId,
@@ -74,7 +84,15 @@ export const upvoteAnswer = async (params: AnswerVoteParams) => {
       throw new Error("Question not found");
     }
 
-    // increment the users reputation
+    // Increment or decrement user reputation by +1/-1 for receiving  upvote/downvote to the questions
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -2 : 2 },
+    });
+
+    // Increment or decrement author reputation by +10/-10 for receiving  upvote/downvote to the questions
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {
@@ -110,7 +128,15 @@ export const downvoteAnswer = async (params: AnswerVoteParams) => {
       throw new Error("answer not found");
     }
 
-    // increment the users reputation
+    // Increment or decrement user reputation by +2/-2 for receiving  upvote/downvote to the questions
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasdownVoted ? -2 : 2 },
+    });
+
+    // Increment or decrement author reputation by +10/-10 for receiving  upvote/downvote to the questions
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasdownVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {
