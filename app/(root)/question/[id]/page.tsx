@@ -10,6 +10,7 @@ import { auth } from "@clerk/nextjs";
 import { getUserById } from "@/lib/actions/user.action";
 import AllAnswers from "@/components/sheared/AllAnswers";
 import Votes from "@/components/sheared/Votes";
+import NoResult from "@/components/sheared/NoResult";
 
 interface QuestionAnswerParams {
   id: string;
@@ -22,6 +23,21 @@ const QuestionAnswer = async ({ params }: { params: QuestionAnswerParams }) => {
   let mongoUser;
   if (userId) {
     mongoUser = await getUserById({ userId });
+  }
+
+  if (!result) {
+    return (
+      <>
+        <NoResult
+          title='There are no question to show'
+          description={`Be the first to break the silence! 🚀 Ask a Question and kickstart the
+            discussion. our query could be the next big thing others learn from. Get
+            involved! 💡`}
+          link='/ask-question'
+          linkTitle='Ask a Question'
+        />
+      </>
+    );
   }
 
   return (
