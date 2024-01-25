@@ -48,7 +48,7 @@ const AnswerCard = ({
           {showActionButtons && (
             <EditDeleteAction
               type='answer'
-              itemId={JSON.stringify(_id)}
+              itemId={JSON.stringify(answer_Id)}
             />
           )}
         </SignedIn>

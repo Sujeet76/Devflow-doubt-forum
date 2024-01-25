@@ -28,6 +28,7 @@ interface Props {
 const Answer = ({ question, questionId, authorId }: Props) => {
   const pathname = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingAiAnswer, setIsGeneratingAiAnswer] = useState(false);
   const editorRef = useRef(null);
   const { mode } = useTheme();
   const form = useForm<z.infer<typeof AnswerSchema>>({
@@ -62,13 +63,44 @@ const Answer = ({ question, questionId, authorId }: Props) => {
     }
   };
 
+  // generate ai answer
+  const generateAiAnswer = async () => {
+    setIsGeneratingAiAnswer(true);
+    try {
+      // call function
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/chatgpt`,
+        {
+          method: "POST",
+          body: JSON.stringify({ question }),
+        }
+      );
+
+      const apiAnswer = await response.json();
+      // Convert plain text to HTML format
+      const formattedAnswer = apiAnswer.reply.replace(/\n/g, "<br />");
+      if (editorRef.current) {
+        const editor = editorRef.current as any;
+        editor.setContent(formattedAnswer);
+      }
+    } catch (e) {
+      console.log(`error while generating ai answer ${e}`);
+    } finally {
+      setIsGeneratingAiAnswer(false);
+    }
+  };
+
   return (
     <div>
       <div className='mt-5 flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2'>
         <h4 className='paragraph-semibold text-dark400_light800'>
           Write your answer here
         </h4>
-        <Button className='btn light-border-2 gap-1.5 rounded-md text-primary-500 shadow-none sm:flex-row sm:items-center sm:gap-2'>
+        <Button
+          className='btn light-border-2 gap-1.5 rounded-md text-primary-500 shadow-none sm:flex-row sm:items-center sm:gap-2'
+          onClick={generateAiAnswer}
+          disabled={isGeneratingAiAnswer}
+        >
           <Image
             src='/assets/icons/stars.svg'
             alt='generate ai answer'
@@ -76,7 +108,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
             height={12}
             className='object-contain'
           />
-          Generate AI Answer
+          {isGeneratingAiAnswer ? "Generating..." : "Generate AI Answer"}
         </Button>
       </div>
       <Form {...form}>
