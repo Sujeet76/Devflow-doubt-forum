@@ -5,7 +5,7 @@ import NoResult from "@/components/sheared/NoResult";
 import Pagination from "@/components/sheared/Pagination";
 import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { Button } from "@/components/ui/button";
-import { QuestionFilters } from "@/constants/filters";
+import { HomePageFilters } from "@/constants/filters";
 import { getQuestions } from "@/lib/actions/question.action";
 import { SearchParamsProps } from "@/types";
 import { Metadata } from "next";
@@ -47,7 +47,7 @@ export default async function Home({ searchParams }: SearchParamsProps) {
             iconPosition='left'
           />
           <Filters
-            filters={QuestionFilters}
+            filters={HomePageFilters}
             otherClasses='min-h-[56px] sm:min-w-[170px]'
             containerClasses='hidden max-md:flex'
           />
