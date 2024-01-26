@@ -8,6 +8,7 @@ import EditDeleteAction from "../sheared/EditDeleteAction";
 interface QuestionProps {
   _id: string;
   clerkId?: string;
+  userId?:string;
   title: string;
   tags: {
     _id: string;
@@ -28,6 +29,7 @@ interface QuestionProps {
 const QuestionCard = ({
   _id,
   clerkId,
+  userId,
   title,
   tags,
   author,
@@ -56,6 +58,7 @@ const QuestionCard = ({
             <EditDeleteAction
               type='question'
               itemId={JSON.stringify(_id)}
+              userId={JSON.stringify(userId)}
             />
           )}
         </SignedIn>

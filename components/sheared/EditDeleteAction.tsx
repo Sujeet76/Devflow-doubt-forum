@@ -4,25 +4,41 @@ import { Button } from "../ui/button";
 import { deleteQuestion } from "@/lib/actions/question.action";
 import { deleteAnswer } from "@/lib/actions/answer.action";
 import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface EditDeleteActionProps {
   type: string;
   itemId: string;
+  userId: string;
 }
 
-const EditDeleteAction = ({ type, itemId }: EditDeleteActionProps) => {
+const EditDeleteAction = ({ type, itemId, userId }: EditDeleteActionProps) => {
   const path = usePathname();
   const route = useRouter();
   const handleEdit = () => {
     route.push(`/question/edit/${JSON.parse(itemId)}`);
   };
   const handleDelete = async () => {
-    if (type === "question") {
-      // delete question
-      await deleteQuestion({ questionId: JSON.parse(itemId), path });
-    } else {
-      // delete answer
-      await deleteAnswer({ answerId: JSON.parse(itemId), path });
+    try {
+      if (type === "question") {
+        // delete question
+        await deleteQuestion({
+          questionId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          path,
+        });
+        toast.success("Question deleted successfully");
+      } else {
+        // delete answer
+        await deleteAnswer({
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          path,
+        });
+        toast.success("Answer deleted successfully");
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "some this went wrong while deletion");
     }
   };
 

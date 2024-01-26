@@ -25,6 +25,7 @@ import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
 import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import { useTheme } from "@/context/ThemeProvider";
+import { toast } from "sonner";
 
 interface Props {
   mongoUserId: string;
@@ -72,16 +73,20 @@ const QuestionForm = ({
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof QuestionSchema>) {
+    let toastId;
     try {
       setIsSubmitting(true);
       if (type === "edit") {
+        toastId = toast.loading("Editing your question...");
         await editQuestion({
           questionId: parsedQuestionDetails?._id ?? "",
           title: values.title,
           content: values.explanation,
           path: pathname,
         });
+        toast.success("Your question has been edited.", { id: toastId });
       } else {
+        toastId = toast.loading("Posting your question...");
         await createQuestion({
           title: values.title,
           content: values.explanation,
@@ -89,17 +94,20 @@ const QuestionForm = ({
           author: JSON.parse(mongoUserId),
           path: pathname,
         });
+        toast.success("Your question has been posted.", { id: toastId });
       }
 
       // navigate to homepage
       route.push("/");
-    } catch (e) {
+    } catch (e: any) {
       console.log("Error while creating Question(F) -> ", e);
-      throw new Error("Error while creating Question");
+      toast.error(
+        e?.message ?? "Something went wrong while creating question",
+        { id: toastId }
+      );
     } finally {
       setIsSubmitting(false);
     }
-    console.log(values);
   }
 
   const handelInputKeyDown = (
@@ -127,6 +135,7 @@ const QuestionForm = ({
       } else {
         form.trigger();
       }
+      toast.success("Tag added");
     }
   };
 
@@ -135,6 +144,7 @@ const QuestionForm = ({
     // console.log(field);
     const newTags = field.value.filter((t: string) => t !== tag);
     form.setValue("tags", newTags);
+    toast.message("Tag removed.");
   };
 
   return (
@@ -158,6 +168,7 @@ const QuestionForm = ({
                     placeholder='Enter the Question'
                     {...field}
                     className='no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border'
+                    disabled={isSubmitting}
                   />
                 </FormControl>
                 <FormDescription className='body-regular mt-2.5 text-light-500'>
@@ -187,6 +198,7 @@ const QuestionForm = ({
                     }}
                     initialValue={parsedQuestionDetails?.content ?? ""}
                     onBlur={field.onBlur}
+                    disabled={isSubmitting}
                     onEditorChange={(content) => field.onChange(content)}
                     init={{
                       height: 350,
@@ -242,7 +254,7 @@ const QuestionForm = ({
                       placeholder='Enter the tag'
                       onKeyDown={(e) => handelInputKeyDown(e, field)}
                       className='no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border'
-                      disabled={type === "edit"}
+                      disabled={type === "edit" || isSubmitting}
                     />
                     {field.value.length > 0 && (
                       <div className='flex-start mt-2.5 flex-wrap gap-2.5'>
@@ -280,7 +292,7 @@ const QuestionForm = ({
           />
           <Button
             type='submit'
-            className='primary-gradient w-fit !text-light-900'
+            className='primary-gradient w-full !text-light-900 sm:w-fit lg:w-fit'
             disabled={isSubmitting}
           >
             {isSubmitting ? (

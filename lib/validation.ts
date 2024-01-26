@@ -10,7 +10,10 @@ export const QuestionSchema = z.object({
       message: "title must be at most 130 characters.",
     }),
   explanation: z.string().min(100),
-  tags: z.array(z.string().min(1).max(20)).min(1).max(5),
+  tags: z
+    .array(z.string().min(2).max(20))
+    .min(2, { message: "minimum 2 tags are required" })
+    .max(10, { message: "maximum 10 tags are allowed" }),
 });
 
 export const AnswerSchema = z.object({

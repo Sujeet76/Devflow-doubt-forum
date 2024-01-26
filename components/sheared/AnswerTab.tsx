@@ -25,6 +25,7 @@ const AnswerTab = async ({ searchParams, userId, clerkId }: AnswerTabProps) => {
               key={answer._id}
               _id={answer.question._id}
               clerkId={clerkId}
+              userId={userId}
               answer_Id={answer._id}
               title={answer.question.title}
               author={answer.author}

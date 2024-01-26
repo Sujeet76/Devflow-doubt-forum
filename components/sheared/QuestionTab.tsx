@@ -30,6 +30,7 @@ const QuestionTab = async ({
               key={question._id}
               _id={question._id}
               clerkId={clerkId}
+              userId={userId}
               title={question.title}
               tags={question.tags}
               author={question.author}

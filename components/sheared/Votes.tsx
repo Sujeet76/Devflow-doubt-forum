@@ -11,6 +11,7 @@ import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answer.action";
 import { toggleSaveQuestion } from "@/lib/actions/user.action";
 import { useEffect } from "react";
 import { viewQuestion } from "@/lib/actions/interaction.action";
+import { toast } from "sonner";
 
 interface VotesProps {
   type: string;
@@ -37,43 +38,56 @@ const Votes = ({
   const router = useRouter();
 
   const handleVote = async (action: string) => {
-    if (!userId) return;
-
-    if (action === "upvote") {
-      if (type === "question") {
-        console.log("upvote");
-        await upvoteQuestion({
-          questionId: JSON.parse(itemId),
-          userId: JSON.parse(userId),
-          hasupVoted,
-          path: pathname,
-        });
-      } else if (type === "answer") {
-        await upvoteAnswer({
-          answerId: JSON.parse(itemId),
-          userId: JSON.parse(userId),
-          hasupVoted,
-          path: pathname,
+    try {
+      if (!userId) {
+        return toast.error("You need to login to vote", {
+          description: "You must be logged in to vote on this question.",
         });
       }
-    }
 
-    if (action === "downvote") {
-      if (type === "question") {
-        await downvoteQuestion({
-          questionId: JSON.parse(itemId),
-          userId: JSON.parse(userId),
-          hasdownVoted,
-          path: pathname,
-        });
-      } else if (type === "answer") {
-        await downvoteAnswer({
-          answerId: JSON.parse(itemId),
-          userId: JSON.parse(userId),
-          hasdownVoted,
-          path: pathname,
-        });
+      if (action === "upvote") {
+        if (type === "question") {
+          await upvoteQuestion({
+            questionId: JSON.parse(itemId),
+            userId: JSON.parse(userId),
+            hasupVoted,
+            path: pathname,
+          });
+        } else if (type === "answer") {
+          await upvoteAnswer({
+            answerId: JSON.parse(itemId),
+            userId: JSON.parse(userId),
+            hasupVoted,
+            path: pathname,
+          });
+        }
+        return !hasupVoted
+          ? toast.success(`Upvoted successfully`)
+          : toast.warning("Upvote removed");
       }
+
+      if (action === "downvote") {
+        if (type === "question") {
+          await downvoteQuestion({
+            questionId: JSON.parse(itemId),
+            userId: JSON.parse(userId),
+            hasdownVoted,
+            path: pathname,
+          });
+        } else if (type === "answer") {
+          await downvoteAnswer({
+            answerId: JSON.parse(itemId),
+            userId: JSON.parse(userId),
+            hasdownVoted,
+            path: pathname,
+          });
+        }
+        return !hasdownVoted
+          ? toast.success(`Downvote successfully`)
+          : toast.warning("Downvote removed");
+      }
+    } catch (e: any) {
+      return toast.error(e?.message ?? "something went wrong");
     }
   };
 
@@ -85,11 +99,21 @@ const Votes = ({
   }, [itemId, userId, pathname, router]);
 
   const saveToCollection = async () => {
+    if (!userId) {
+      return toast.error("Please Login", {
+        description:
+          "You must be logged in to save this question in your collection.",
+      });
+    }
+
     await toggleSaveQuestion({
       questionId: JSON.parse(itemId),
       userId: JSON.parse(userId),
       path: pathname,
     });
+    return !hasSaved
+      ? toast.success(`Added to collection`)
+      : toast.error("Removed from removed");
   };
 
   return (

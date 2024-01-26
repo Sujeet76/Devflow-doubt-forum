@@ -124,6 +124,7 @@ const QuestionAnswer = async ({ params }: { params: QuestionAnswerParams }) => {
       />
 
       <Answer
+        questionAuthorId={JSON.stringify(result?.author?._id)}
         question={result?.content}
         questionId={JSON.stringify(result?._id)}
         authorId={JSON.stringify(mongoUser?._id)}

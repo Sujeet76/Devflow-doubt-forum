@@ -18,6 +18,15 @@ export async function createAnswer(params: CreateAnswerParams) {
     connectToDB();
 
     const { content, author, question, path } = params;
+    // is owner of this question
+    const isOwner = await Question.exists({
+      _id: question,
+      author,
+    });
+
+    if (isOwner) {
+      throw new Error("You can't answer your own question");
+    }
 
     const newAnswer = await Answer.create({ content, author, question });
 
@@ -40,6 +49,7 @@ export async function createAnswer(params: CreateAnswerParams) {
     revalidatePath(path);
   } catch (error) {
     console.log("Error while creating answer => ", error);
+    throw error;
   }
 }
 
@@ -61,6 +71,18 @@ export const upvoteAnswer = async (params: AnswerVoteParams) => {
     connectToDB();
     const { answerId, userId, hasupVoted, path } = params;
     let updateQuery = {};
+
+    // is owner of the answer
+    const isOwner = await Answer.exists({
+      _id: answerId,
+      author: userId,
+    });
+
+    if (isOwner) throw new Error("You can't upvote you own this answer");
+
+    if (isOwner) {
+      throw new Error("You can't upvote you own this question");
+    }
 
     // if the user has already upvoted the question, remove the downvote
     if (hasupVoted) {
@@ -97,6 +119,7 @@ export const upvoteAnswer = async (params: AnswerVoteParams) => {
     revalidatePath(path);
   } catch (error) {
     console.log("Error while upvote answer => ", error);
+    throw error;
   }
 };
 
@@ -105,6 +128,14 @@ export const downvoteAnswer = async (params: AnswerVoteParams) => {
     connectToDB();
     const { answerId, userId, hasdownVoted, path } = params;
     let updateQuery = {};
+
+    // is owner of the answer
+    const isOwner = await Answer.exists({
+      _id: answerId,
+      author: userId,
+    });
+
+    if (isOwner) throw new Error("You can't down you own this answer");
 
     // if the user has already downvoted the question, remove the downvote
     if (hasdownVoted) {
@@ -141,6 +172,7 @@ export const downvoteAnswer = async (params: AnswerVoteParams) => {
     revalidatePath(path);
   } catch (error) {
     console.log("Error while upvote answer => ", error);
+    throw error;
   }
 };
 
@@ -148,7 +180,13 @@ export const deleteAnswer = async (params: DeleteAnswerParams) => {
   try {
     connectToDB();
 
-    const { answerId, path } = params;
+    const { answerId, path, userId } = params;
+    const isOwner = await Answer.exists({
+      _id: answerId,
+      author: userId,
+    });
+
+    if (!isOwner) throw new Error("You can't delete this answer");
     const answer = await Answer.findByIdAndDelete(answerId);
 
     if (!answer) throw Error("Answer not found");
@@ -172,5 +210,6 @@ export const deleteAnswer = async (params: DeleteAnswerParams) => {
     revalidatePath(path);
   } catch (error) {
     console.log(`Error while deleting answer => ${error}`);
+    throw error;
   }
 };

@@ -18,14 +18,21 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import { createAnswer } from "@/lib/actions/answer.action";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 interface Props {
+  questionAuthorId: string;
   question: string;
   questionId: string;
   authorId: string;
 }
 
-const Answer = ({ question, questionId, authorId }: Props) => {
+const Answer = ({
+  question,
+  questionId,
+  authorId,
+  questionAuthorId,
+}: Props) => {
   const pathname = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingAiAnswer, setIsGeneratingAiAnswer] = useState(false);
@@ -39,8 +46,15 @@ const Answer = ({ question, questionId, authorId }: Props) => {
   });
 
   const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
+    if (!authorId) {
+      return toast.error("Please login", {
+        description: "To submit answer you have to fist login",
+      });
+    }
     setIsSubmitting(true);
+    let toastId;
     try {
+      toastId = toast.loading("Submitting answer...");
       await createAnswer({
         content: values.answer,
         author: JSON.parse(authorId),
@@ -55,39 +69,59 @@ const Answer = ({ question, questionId, authorId }: Props) => {
         editor.setContent("");
       }
       setIsSubmitting(false);
-    } catch (error) {
+      toast.success("Answer added successfully", { id: toastId });
+    } catch (error: any) {
       setIsSubmitting(false);
       console.log("Error in answer => .", error);
+      toast.error(
+        error?.message ?? "something went wrong while creating answer",
+        { id: toastId }
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // generate ai answer
-  const generateAiAnswer = async () => {
-    setIsGeneratingAiAnswer(true);
-    try {
-      // call function
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/chatgpt`,
-        {
-          method: "POST",
-          body: JSON.stringify({ question }),
-        }
-      );
-
-      const apiAnswer = await response.json();
-      // Convert plain text to HTML format
-      const formattedAnswer = apiAnswer.reply.replace(/\n/g, "<br />");
-      if (editorRef.current) {
-        const editor = editorRef.current as any;
-        editor.setContent(formattedAnswer);
-      }
-    } catch (e) {
-      console.log(`error while generating ai answer ${e}`);
-    } finally {
-      setIsGeneratingAiAnswer(false);
+  const generateAiAnswer = () => {
+    if (!authorId) {
+      return toast.error("Can not generate", {
+        description: "You need to login first",
+      });
     }
+    setIsGeneratingAiAnswer(true);
+
+    if (authorId === questionAuthorId) {
+      toast.error("Can not generate", {
+        description: "You cannot generate Ai answer on your own question",
+      });
+    }
+    toast.promise(
+      fetch(`${process.env.NEXT_PUBLIC_URL}/api/chatgpt`, {
+        method: "POST",
+        body: JSON.stringify({ question }),
+      }),
+      {
+        loading: "Ai is generating answer...",
+        success: async (data) => {
+          const apiAnswer = await data.json();
+          // Convert plain text to HTML format
+          const formattedAnswer = apiAnswer.reply.replace(/\n/g, "<br />");
+          if (editorRef.current) {
+            const editor = editorRef.current as any;
+            editor.setContent(formattedAnswer);
+          }
+          return "AI answer generated successfully";
+        },
+        error: (e) => {
+          setIsGeneratingAiAnswer(false);
+          return e?.message ?? "something went wrong while generating answer";
+        },
+        finally: () => {
+          setIsGeneratingAiAnswer(false);
+        },
+      }
+    );
   };
 
   return (
@@ -99,7 +133,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
         <Button
           className='btn light-border-2 gap-1.5 rounded-md text-primary-500 shadow-none sm:flex-row sm:items-center sm:gap-2'
           onClick={generateAiAnswer}
-          disabled={isGeneratingAiAnswer}
+          disabled={isGeneratingAiAnswer || authorId === questionAuthorId}
         >
           <Image
             src='/assets/icons/stars.svg'
@@ -130,6 +164,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
                     }}
                     onBlur={field.onBlur}
                     onEditorChange={(content) => field.onChange(content)}
+                    disabled={isSubmitting || authorId === questionAuthorId}
                     init={{
                       height: 350,
                       menubar: false,
@@ -173,7 +208,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
             <Button
               type='submit'
               className='primary-gradient w-fit text-white'
-              disabled={isSubmitting}
+              disabled={isSubmitting || authorId === questionAuthorId}
             >
               {isSubmitting ? "submitting..." : "submit"}
             </Button>

@@ -9,6 +9,7 @@ interface AnswerProps {
   _id: string;
   answer_Id: string;
   clerkId?: string;
+  userId?: string;
   title: string;
   author: {
     _id: string;
@@ -28,6 +29,7 @@ const AnswerCard = ({
   author,
   upvotes,
   createdAt,
+  userId,
 }: AnswerProps) => {
   const showActionButtons = clerkId && clerkId === author?.clerkId;
 
@@ -49,6 +51,7 @@ const AnswerCard = ({
             <EditDeleteAction
               type='answer'
               itemId={JSON.stringify(answer_Id)}
+              userId={JSON.stringify(userId)}
             />
           )}
         </SignedIn>

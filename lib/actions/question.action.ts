@@ -170,6 +170,16 @@ export const upvoteQuestion = async (params: QuestionVoteParams) => {
     const { questionId, userId, hasupVoted, path } = params;
     let updateQuery = {};
 
+    // is owner of the question
+    const isOwner = await Question.exists({
+      _id: questionId,
+      author: userId,
+    });
+
+    if (isOwner) {
+      throw new Error("You can't upvote you own this question");
+    }
+
     // if the user has already upvoted the question, remove the downvote
     if (hasupVoted) {
       updateQuery = { $pull: { upvotes: userId } };
@@ -203,8 +213,9 @@ export const upvoteQuestion = async (params: QuestionVoteParams) => {
     });
 
     revalidatePath(path);
-  } catch (error) {
+  } catch (error: any) {
     console.log("Error while upvote => ", error);
+    throw error;
   }
 };
 
@@ -213,6 +224,16 @@ export const downvoteQuestion = async (params: QuestionVoteParams) => {
     connectToDB();
     const { questionId, userId, hasdownVoted, path } = params;
     let updateQuery = {};
+
+    // is owner of the question
+    const isOwner = await Question.exists({
+      _id: questionId,
+      author: userId,
+    });
+
+    if (isOwner) {
+      throw new Error("You can't downvote you own this question");
+    }
 
     // if the user has already downvoted the question, remove the downvote
     if (hasdownVoted) {
@@ -247,8 +268,9 @@ export const downvoteQuestion = async (params: QuestionVoteParams) => {
     });
 
     revalidatePath(path);
-  } catch (error) {
+  } catch (error: any) {
     console.log("Error while upvote => ", error);
+    throw error;
   }
 };
 
@@ -259,8 +281,10 @@ export const deleteQuestion = async (params: DeleteQuestionParams) => {
 
     connectToDB();
 
-    const { questionId, path } = params;
-    const isQuestionExist = await Question.findById(questionId);
+    const { questionId, path, userId } = params;
+    const isQuestionExist = await Question.findOne({
+      $and: [{ _id: questionId }, { owner: userId }],
+    });
     if (!isQuestionExist) {
       throw new Error("Question not found");
     }

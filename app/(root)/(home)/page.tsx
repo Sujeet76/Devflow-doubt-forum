@@ -8,7 +8,14 @@ import { Button } from "@/components/ui/button";
 import { QuestionFilters } from "@/constants/filters";
 import { getQuestions } from "@/lib/actions/question.action";
 import { SearchParamsProps } from "@/types";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metaTag: Metadata = {
+  title: "Home | Dev Answers",
+  description:
+    "Dev Answers is a Q&A platform for developers to ask questions and get answers from other developers.",
+};
 
 export default async function Home({ searchParams }: SearchParamsProps) {
   const result = await getQuestions({
