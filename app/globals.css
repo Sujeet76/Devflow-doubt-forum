@@ -211,3 +211,37 @@ code {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* style sign-up/sign-in */
+
+.cl-card {
+  @apply bg-light-900 dark:bg-dark-200 !important;
+}
+.cl-headerTitle {
+  @apply text-dark-100 dark:text-light-900 font-semibold !important;
+}
+.cl-headerSubtitle,
+.cl-socialButtonsBlockButtonText,
+.cl-dividerText,
+.cl-formFieldLabel,
+.cl-footerActionText {
+  @apply text-dark-400 dark:text-light-700 !important;
+}
+.cl-socialButtonsBlockButton {
+  @apply dark:border-[#3F4354] border-light-700 !important;
+}
+.cl-socialButtonsBlockButtonArrow,
+.cl-formFieldInputShowPasswordIcon {
+  @apply text-dark-400 dark:text-light-700 !important;
+}
+.cl-dividerLine {
+  @apply dark:bg-[#3F4354] bg-light-700 !important;
+}
+
+.cl-formFieldInput {
+  @apply dark:bg-[#151821] bg-light-800 text-dark-400 dark:text-light-700 focus:ring-2 dark:focus:ring-[#3F4354] focus:ring-light-700  focus:outline-none !important;
+}
+
+.cl-formFieldHintText {
+  @apply text-dark-400/50 dark:text-light-700/50 !important;
+}
