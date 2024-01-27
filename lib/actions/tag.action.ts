@@ -8,6 +8,7 @@ import {
 import Tag from "@/database/tag.modal";
 import Question from "@/database/question.modal";
 import { FilterQuery } from "mongoose";
+import Interaction from "@/database/interaction.modal";
 
 export async function getTopInteractionTags(
   params: GetTopInteractedTagsParams
@@ -15,19 +16,26 @@ export async function getTopInteractionTags(
   try {
     connectToDB();
 
-    const { userId } = params;
+    const { userId, limit = 2 } = params;
 
     const user = await User.findById(userId);
 
     if (!user) throw new Error("User not found");
 
     // find interaction for the user and group by tag...
-    // Interaction...
+    const tagMap = await Interaction.aggregate([
+      { $match: { user: user._id, tags: { $exists: true, $ne: [] } } },
+      { $unwind: "$tags" },
+      { $group: { _id: "$tags", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: limit },
+    ]);
+    // get id array of tags
+    const tagsArray = tagMap.map((tag: any) => tag._id);
 
-    return [
-      { _id: "1", name: "tag1" },
-      { _id: "2", name: "tag2" },
-    ];
+    // find top tag document
+    const tagDoc = await Tag.find({ _id: { $in: tagsArray } });
+    return tagDoc;
   } catch (error) {
     console.log("Error while => ", error);
   }

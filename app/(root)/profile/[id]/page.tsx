@@ -12,6 +12,7 @@ import Stats from "@/components/sheared/Stats";
 import QuestionTab from "@/components/sheared/QuestionTab";
 import AnswerTab from "@/components/sheared/AnswerTab";
 import NoResult from "@/components/sheared/NoResult";
+import TopInteractedTags from "@/components/sheared/TopInteractedTags";
 
 const Profile = async ({ params, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
@@ -92,7 +93,7 @@ const Profile = async ({ params, searchParams }: URLProps) => {
         badges={userInfo?.badgeCounts}
         reputation={userInfo?.reputation | 0}
       />
-      <div className='mt-10 flex gap-10'>
+      <div className='mt-10 flex flex-col gap-10 lg:flex-row'>
         <Tabs
           defaultValue='top-posts'
           className='flex-1'
@@ -128,6 +129,16 @@ const Profile = async ({ params, searchParams }: URLProps) => {
             />
           </TabsContent>
         </Tabs>
+        {/* top interacted tags */}
+        <div className='flex min-w-[240px] flex-col max-lg:hidden'>
+          <h4 className='h3-semibold text-dark400_light900 flex min-h-[42px] items-center'>
+            Top Tags
+          </h4>
+          <TopInteractedTags
+            searchParams={searchParams}
+            userId={userInfo?.user._id}
+          />
+        </div>
       </div>
     </>
   );

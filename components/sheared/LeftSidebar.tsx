@@ -1,6 +1,6 @@
 "use client";
 import { sidebarLinks } from "@/constants";
-import { SignedOut, useAuth } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -19,13 +19,41 @@ const LeftSidebar = () => {
             (pathname.includes(item.route) && item.route.length > 1) ||
             pathname === item.route;
 
+          // show this profile route to signed in user only
+          if (item.route === "/profile") {
+            return (
+              <SignedIn key={item.route}>
+                <Link
+                  href={`${item.route}/${userId}`}
+                  className={`${
+                    isActive
+                      ? "primary-gradient rounded-lg text-light-900"
+                      : "text-dark300_light900"
+                  } flex items-center justify-start gap-4 bg-transparent px-4 py-3`}
+                >
+                  <Image
+                    src={item.imgURL}
+                    alt={item.label}
+                    width={20}
+                    height={20}
+                    className={`${isActive ? "" : "invert-colors"}`}
+                  />
+                  <p
+                    className={`${
+                      isActive ? "base-bold" : "base-medium"
+                    } max-lg:hidden`}
+                  >
+                    {item.label}
+                  </p>
+                </Link>
+              </SignedIn>
+            );
+          }
+
+          // other routes
           return (
             <Link
-              href={
-                item.route === "/profile"
-                  ? `${item.route}/${userId}`
-                  : item.route
-              }
+              href={item.route}
               key={item.route}
               className={`${
                 isActive
