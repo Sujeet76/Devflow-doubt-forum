@@ -8,18 +8,14 @@ import { SearchParamsProps } from "@/types";
 import Pagination from "@/components/sheared/Pagination";
 
 const page = async ({ searchParams }: SearchParamsProps) => {
-  let result;
+  // let result;
   // TODO:ERROR WHILE DEPLOYMENT ON APP
-  try {
-    result = await getAllUsers({
-      searchQuery: searchParams?.q,
-      filter: searchParams?.filter,
-      page: searchParams.page ? +searchParams.page : 1,
-      pageSize: searchParams.pageSize ? +searchParams.pageSize : 20,
-    });
-  } catch (err) {
-    console.log(err);
-  }
+  const result = await getAllUsers({
+    searchQuery: searchParams?.q,
+    filter: searchParams?.filter,
+    page: searchParams.page ? +searchParams.page : 1,
+    pageSize: searchParams.pageSize ? +searchParams.pageSize : 20,
+  });
 
   return (
     <>
