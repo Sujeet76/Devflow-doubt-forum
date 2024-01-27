@@ -1,7 +1,7 @@
 "use client";
 
 // form import
-import { KeyboardEvent, useRef, useState } from "react";
+import { KeyboardEvent, useRef, useState, useEffect } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -26,6 +26,9 @@ import { Badge } from "../ui/badge";
 import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import { useTheme } from "@/context/ThemeProvider";
 import { toast } from "sonner";
+import { getTagOnKeyStroke } from "@/lib/actions/tag.action";
+import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
 
 interface Props {
   mongoUserId: string;
@@ -40,6 +43,19 @@ interface IQuestionDetails {
   tags: { name: string; _id: string }[];
 }
 
+type suggestedTagT = {
+  _id: string;
+  name: string;
+};
+
+const randData = [
+  { _id: 1, name: "linker-errors" },
+  { _id: 2, name: "mongodb" },
+  { _id: 3, name: "next.js" },
+  { _id: 3, name: "next.js" },
+  { _id: 3, name: "next.js" },
+];
+
 const QuestionForm = ({
   mongoUserId,
   type = "submit",
@@ -48,6 +64,8 @@ const QuestionForm = ({
   const { mode } = useTheme();
   const route = useRouter();
   const pathname = usePathname();
+  const [tag, setTag] = useState("");
+  const [suggestedTag, setSuggestedTag] = useState<suggestedTagT[] | []>([]);
 
   let parsedQuestionDetails: IQuestionDetails | undefined;
   let tagArr: string[] | undefined;
@@ -138,6 +156,16 @@ const QuestionForm = ({
       toast.success("Tag added");
     }
   };
+
+  useEffect(() => {
+    const debouncedFn = setTimeout(async () => {
+      if (tag === "") return;
+      const result = await getTagOnKeyStroke(tag);
+      // console.log(result);
+      setSuggestedTag(result ? JSON.parse(result) : []);
+    }, 500);
+    return () => clearInterval(debouncedFn);
+  }, [tag]);
 
   const handelRemoveTag = (tag: string, field: any) => {
     // console.log(tag);
@@ -244,7 +272,7 @@ const QuestionForm = ({
             control={form.control}
             name='tags'
             render={({ field }) => (
-              <FormItem className='flex w-full flex-col'>
+              <FormItem className='relative flex w-full flex-col'>
                 <FormLabel className='paragraph-semibold text-dark400_light800'>
                   Tags <sup className='text-primary-500'>*</sup>
                 </FormLabel>
@@ -253,9 +281,32 @@ const QuestionForm = ({
                     <Input
                       placeholder='Enter the tag'
                       onKeyDown={(e) => handelInputKeyDown(e, field)}
+                      onChange={(e) => setTag(e.target.value)}
                       className='no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border'
                       disabled={type === "edit" || isSubmitting}
                     />
+                    {randData.length > 0 && (
+                      <div className='absolute bottom-[100%] right-[60%] h-[200px] w-48'>
+                        <ScrollArea className='h-[200px] w-48 rounded-lg border-2 bg-light-900 py-2 dark:border-dark-400 dark:bg-dark-200'>
+                          <div className='px-4'>
+                            <h4 className='h3-semibold text-dark500_light700 my-3'>
+                              Tags
+                            </h4>
+                            {randData.map((tag) => (
+                              <>
+                                <div
+                                  key={tag._id}
+                                  className='body-medium text-dark100_light900 cursor-pointer rounded p-2 transition-all hover:bg-light-700 dark:hover:bg-dark-400'
+                                >
+                                  {tag.name}
+                                </div>
+                                <Separator className='light-border-2 border last:invisible' />
+                              </>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </div>
+                    )}
                     {field.value.length > 0 && (
                       <div className='flex-start mt-2.5 flex-wrap gap-2.5'>
                         {field.value.map((tag: string, index) => (

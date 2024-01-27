@@ -1,3 +1,5 @@
+"use server";
+
 import User from "@/database/user.modal";
 import { connectToDB } from "../mongoose";
 import {
@@ -206,5 +208,21 @@ export async function getTopTags() {
     return tags;
   } catch (error) {
     console.log("Error while getting top tags ", error);
+  }
+}
+
+export async function getTagOnKeyStroke(searchTag: string) {
+  try {
+    connectToDB();
+
+    const tags = await Tag.find({
+      name: { $regex: new RegExp(searchTag, "i") },
+    }).select("name");
+
+    if (!tags) throw new Error("No tags found");
+
+    return JSON.stringify(tags);
+  } catch (error) {
+    console.log(error);
   }
 }

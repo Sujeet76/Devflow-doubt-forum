@@ -26,7 +26,7 @@ const LocalSearch = ({
   const [search, setSearch] = useState(searchParams.get("q") || "");
 
   useEffect(() => {
-    setTimeout(() => {
+    const debouncedFn = setTimeout(() => {
       if (search) {
         const newUrl = formUrlQuery({
           params: searchParams.toString(),
@@ -46,6 +46,8 @@ const LocalSearch = ({
         }
       }
     }, 300);
+
+    return () => clearInterval(debouncedFn);
   }, [search, router, setSearch, pathname, searchParams, route]);
 
   return (
