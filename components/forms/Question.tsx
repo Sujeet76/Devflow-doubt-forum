@@ -1,12 +1,11 @@
 "use client";
 
 // form import
-import { KeyboardEvent, useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { QuestionSchema } from "../../lib/validation";
-import Image from "next/image";
 import { Editor } from "@tinymce/tinymce-react";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -22,13 +21,10 @@ import {
 } from "@/components/ui/form";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Badge } from "../ui/badge";
 import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import { useTheme } from "@/context/ThemeProvider";
 import { toast } from "sonner";
-import { getTagOnKeyStroke } from "@/lib/actions/tag.action";
-import { ScrollArea } from "../ui/scroll-area";
-import { Separator } from "../ui/separator";
+import TagField from "./formComponent/TagField";
 
 interface Props {
   mongoUserId: string;
@@ -43,19 +39,6 @@ interface IQuestionDetails {
   tags: { name: string; _id: string }[];
 }
 
-type suggestedTagT = {
-  _id: string;
-  name: string;
-};
-
-const randData = [
-  { _id: 1, name: "linker-errors" },
-  { _id: 2, name: "mongodb" },
-  { _id: 3, name: "next.js" },
-  { _id: 3, name: "next.js" },
-  { _id: 3, name: "next.js" },
-];
-
 const QuestionForm = ({
   mongoUserId,
   type = "submit",
@@ -64,8 +47,6 @@ const QuestionForm = ({
   const { mode } = useTheme();
   const route = useRouter();
   const pathname = usePathname();
-  const [tag, setTag] = useState("");
-  const [suggestedTag, setSuggestedTag] = useState<suggestedTagT[] | []>([]);
 
   let parsedQuestionDetails: IQuestionDetails | undefined;
   let tagArr: string[] | undefined;
@@ -127,53 +108,6 @@ const QuestionForm = ({
       setIsSubmitting(false);
     }
   }
-
-  const handelInputKeyDown = (
-    e: KeyboardEvent<HTMLInputElement>,
-    field: any
-  ) => {
-    if (e.key === "Enter" && field.name === "tags") {
-      e.preventDefault();
-
-      const tagInput = e.target as HTMLInputElement;
-      const tagValue = tagInput.value.trim();
-      if (tagValue !== "") {
-        if (tagValue.length > 15) {
-          return form.setError("tags", {
-            type: "required",
-            message: "Tag must be less than 15 characters.",
-          });
-        }
-      }
-
-      if (!field.value.includes(tagValue as never)) {
-        form.setValue("tags", [...field.value, tagValue]);
-        tagInput.value = "";
-        form.clearErrors("tags");
-      } else {
-        form.trigger();
-      }
-      toast.success("Tag added");
-    }
-  };
-
-  useEffect(() => {
-    const debouncedFn = setTimeout(async () => {
-      if (tag === "") return;
-      const result = await getTagOnKeyStroke(tag);
-      // console.log(result);
-      setSuggestedTag(result ? JSON.parse(result) : []);
-    }, 500);
-    return () => clearInterval(debouncedFn);
-  }, [tag]);
-
-  const handelRemoveTag = (tag: string, field: any) => {
-    // console.log(tag);
-    // console.log(field);
-    const newTags = field.value.filter((t: string) => t !== tag);
-    form.setValue("tags", newTags);
-    toast.message("Tag removed.");
-  };
 
   return (
     <div>
@@ -268,78 +202,14 @@ const QuestionForm = ({
             )}
           />
           {/* tags */}
-          <FormField
-            control={form.control}
+          <TagField
+            form={form}
             name='tags'
-            render={({ field }) => (
-              <FormItem className='relative flex w-full flex-col'>
-                <FormLabel className='paragraph-semibold text-dark400_light800'>
-                  Tags <sup className='text-primary-500'>*</sup>
-                </FormLabel>
-                <FormControl className='mt-3.5'>
-                  <>
-                    <Input
-                      placeholder='Enter the tag'
-                      onKeyDown={(e) => handelInputKeyDown(e, field)}
-                      onChange={(e) => setTag(e.target.value)}
-                      className='no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border'
-                      disabled={type === "edit" || isSubmitting}
-                    />
-                    {randData.length > 0 && (
-                      <div className='absolute bottom-[100%] right-[60%] h-[200px] w-48'>
-                        <ScrollArea className='h-[200px] w-48 rounded-lg border-2 bg-light-900 py-2 dark:border-dark-400 dark:bg-dark-200'>
-                          <div className='px-4'>
-                            <h4 className='h3-semibold text-dark500_light700 my-3'>
-                              Tags
-                            </h4>
-                            {randData.map((tag) => (
-                              <>
-                                <div
-                                  key={tag._id}
-                                  className='body-medium text-dark100_light900 cursor-pointer rounded p-2 transition-all hover:bg-light-700 dark:hover:bg-dark-400'
-                                >
-                                  {tag.name}
-                                </div>
-                                <Separator className='light-border-2 border last:invisible' />
-                              </>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </div>
-                    )}
-                    {field.value.length > 0 && (
-                      <div className='flex-start mt-2.5 flex-wrap gap-2.5'>
-                        {field.value.map((tag: string, index) => (
-                          <Badge
-                            key={`${tag}${index}`}
-                            className='subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize'
-                            onClick={() =>
-                              type !== "edit" ? handelRemoveTag(tag, field) : {}
-                            }
-                          >
-                            {tag}
-                            {type !== "edit" && (
-                              <Image
-                                src='/assets/icons/close.svg'
-                                alt='Close icon'
-                                width={12}
-                                height={12}
-                                className='cursor-pointer object-contain invert-0 dark:invert'
-                              />
-                            )}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                </FormControl>
-                <FormDescription className='body-regular mt-2.5 text-light-500'>
-                  Add up to 5 tags to describe what your question is about.
-                  Start typing to see suggestions.
-                </FormDescription>
-                <FormMessage className='text-red-500' />
-              </FormItem>
-            )}
+            label='Tags'
+            placeholder='Enter the tag'
+            type={type}
+            isSubmitting={isSubmitting}
+            tagDescription='Add up to 5 tags to describe what your question is about. Start typing to see suggestions.'
           />
           <Button
             type='submit'
