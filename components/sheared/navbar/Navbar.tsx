@@ -4,10 +4,21 @@ import Link from "next/link";
 import Theme from "./Theme";
 import MobileNav from "./MobileNav";
 import GlobalSearch from "../search/GlobalSearch";
+import { cn } from "@/lib/utils";
 
-const Navbar = () => {
+interface NavbarPros {
+  isGlobalSearch?: boolean;
+  otherClasses?: string;
+}
+
+const Navbar = ({ isGlobalSearch = true, otherClasses }: NavbarPros) => {
   return (
-    <nav className='background-light900_dark200  flex-between custom-shadow fixed z-50 w-full gap-4 p-6 dark:shadow-none sm:px-12'>
+    <nav
+      className={cn(
+        "background-light900_dark200  flex-between custom-shadow fixed z-50 w-full gap-4 p-6 dark:shadow-none sm:px-12",
+        otherClasses
+      )}
+    >
       <Link
         href='/'
         className='flex items-center gap-1'
@@ -23,7 +34,7 @@ const Navbar = () => {
         </p>
       </Link>
 
-      <GlobalSearch />
+      {isGlobalSearch && <GlobalSearch />}
       <div className='flex-between gap-5'>
         <Theme />
         <SignedIn>
