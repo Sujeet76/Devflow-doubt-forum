@@ -28,6 +28,11 @@ export const sidebarLinks: SidebarLink[] = [
     label: "Find Jobs",
   },
   {
+    imgURL: "/assets/icons/notes.svg",
+    route: "/notes",
+    label: "Create Notes",
+  },
+  {
     imgURL: "/assets/icons/tag.svg",
     route: "/tags",
     label: "Tags",

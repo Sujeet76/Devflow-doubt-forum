@@ -1,6 +1,7 @@
 import { Schema } from "mongoose";
 
 import { IUser } from "@/database/user.modal";
+import { INote } from "@/database/note.model";
 
 export interface CreateAnswerParams {
   content: string;
@@ -152,4 +153,14 @@ export interface GetUserStatsParams {
 
 export interface DeleteUserParams {
   clerkId: string;
+}
+
+export interface CreateNoteParams {
+  title: string;
+  owner: Schema.Types.ObjectId | IUser | string;
+  parentDocument?: Schema.Types.ObjectId | INote;
+}
+
+export interface GetANoteParams {
+  noteId: Schema.Types.ObjectId | INote;
 }
