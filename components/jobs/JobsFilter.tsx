@@ -15,10 +15,9 @@ import { formUrlQuery } from "@/lib/utils";
 
 interface JobsFiltersProps {
   countriesList: Country[];
-  userLocation: string;
 }
 
-const JobsFilters = ({ countriesList, userLocation }: JobsFiltersProps) => {
+const JobsFilters = ({ countriesList }: JobsFiltersProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -43,10 +42,7 @@ const JobsFilters = ({ countriesList, userLocation }: JobsFiltersProps) => {
         otherClasses='flex-1 max-sm:w-full'
       />
 
-      <Select
-        onValueChange={(value) => handleUpdateParams(value)}
-        defaultValue={userLocation}
-      >
+      <Select onValueChange={(value) => handleUpdateParams(value)}>
         <SelectTrigger className='body-regular light-border background-light800_dark300 text-dark500_light700 line-clamp-1 flex min-h-[56px] items-center gap-3 border p-4 sm:max-w-[210px]'>
           <Image
             src='/assets/icons/carbon-location.svg'

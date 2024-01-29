@@ -17,10 +17,11 @@ interface Props {
 }
 
 const Jobs = async ({ searchParams }: Props) => {
+  // this page is rendered on server side means the location it will return is the server location on initial page render
   const userLocation = await fetchUserLocation();
   const jobs = await fetchJobs({
     query:
-      `${searchParams.q}, ${searchParams?.location ?? userLocation}` ??
+      `${searchParams.q}, ${searchParams?.location}` ??
       `Software Engineer in ${userLocation}`,
     page: searchParams.page ?? 1,
   });
@@ -31,10 +32,7 @@ const Jobs = async ({ searchParams }: Props) => {
     <>
       <h1 className='h1-bold text-dark100_light900'>Jobs</h1>
       <div className='flex'>
-        <JobsFilters
-          countriesList={countries}
-          userLocation={userLocation}
-        />
+        <JobsFilters countriesList={countries} />
       </div>
 
       <section className='light-border mb-9 mt-11 flex flex-col gap-9 border-b pb-9'>
