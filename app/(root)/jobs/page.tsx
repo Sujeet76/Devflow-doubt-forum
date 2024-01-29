@@ -38,7 +38,7 @@ const Jobs = async ({ searchParams }: Props) => {
       </div>
 
       <section className='light-border mb-9 mt-11 flex flex-col gap-9 border-b pb-9'>
-        {jobs.length > 0 ? (
+        {jobs?.length > 0 ? (
           jobs.map((job: Job, index: number) => {
             if (job.job_title && job.job_title.toLowerCase() !== "undefined")
               return (
@@ -58,7 +58,7 @@ const Jobs = async ({ searchParams }: Props) => {
         )}
       </section>
 
-      {jobs.length > 0 && (
+      {jobs?.length > 0 && (
         <Pagination
           pageNumber={page}
           isNext={jobs.length === 10}
