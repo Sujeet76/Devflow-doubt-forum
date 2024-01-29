@@ -43,11 +43,7 @@ const NavContent = () => {
                     height={20}
                     className={`${isActive ? "" : "invert-colors"}`}
                   />
-                  <p
-                    className={`${
-                      isActive ? "base-bold" : "base-medium"
-                    } max-lg:hidden`}
-                  >
+                  <p className={`${isActive ? "base-bold" : "base-medium"}`}>
                     {item.label}
                   </p>
                 </Link>

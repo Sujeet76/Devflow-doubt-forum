@@ -147,8 +147,7 @@ body {
   background: #ffffff;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 50px;
+  @apply dark:bg-dark-400 bg-light-700 rounded-full w-1;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
@@ -224,14 +223,19 @@ code {
 .cl-socialButtonsBlockButtonText,
 .cl-dividerText,
 .cl-formFieldLabel,
-.cl-footerActionText {
+.cl-footerActionText,
+.cl-internal-1ho4xv,
+.cl-userPreviewSecondaryIdentifier,
+.cl-userButtonPopoverActionButtonText,
+.cl-internal-td400p {
   @apply text-dark-400 dark:text-light-700 !important;
 }
 .cl-socialButtonsBlockButton {
   @apply dark:border-[#3F4354] border-light-700 !important;
 }
 .cl-socialButtonsBlockButtonArrow,
-.cl-formFieldInputShowPasswordIcon {
+.cl-formFieldInputShowPasswordIcon,
+.cl-userButtonPopoverActionButtonIcon {
   @apply text-dark-400 dark:text-light-700 !important;
 }
 .cl-dividerLine {

@@ -109,7 +109,7 @@ const TagField = ({
     // console.log(field);
     const newTags = field.value.filter((t: string) => t !== tag);
     form.setValue("tags", newTags);
-    toast.message("Tag removed.");
+    toast.error("Tag removed.");
   };
 
   // click on suggested tag and add to tags array
@@ -151,7 +151,7 @@ const TagField = ({
 
               {/* suggested tags visible on focus */}
               {isFocus && (
-                <div className='absolute bottom-[100%] right-[60%] z-[100] h-[200px] w-48'>
+                <div className='absolute bottom-[100%] left-[10%] z-[100] h-[200px] w-48'>
                   <ScrollArea className='h-[200px] w-48 rounded-lg border-2 bg-light-900 py-2 dark:border-dark-400 dark:bg-dark-200'>
                     <div className='px-4'>
                       <h4 className='h3-semibold text-dark500_light700 my-3'>
