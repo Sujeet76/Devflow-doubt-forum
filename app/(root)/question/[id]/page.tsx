@@ -25,8 +25,9 @@ export const generateMetadata = async ({
   const result = await getQuestionById({ questionId: params.id });
 
   return {
+    metadataBase: new URL(process.env?.NEXT_PUBLIC_URL ?? ""),
     title: `${result.title} | Dev overflow`,
-    description: `$${result.content.replace(/<[^>]*>/g, "")}`,
+    description: `${result.content.replace(/<[^>]*>/g, "")}`,
     keywords: `${result.tags.map((tag: any) => tag.name).join(", ")}`,
     openGraph: {
       type: "website",
