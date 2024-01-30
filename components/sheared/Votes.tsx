@@ -46,48 +46,56 @@ const Votes = ({
       }
 
       if (action === "upvote") {
+        let res;
         if (type === "question") {
-          await upvoteQuestion({
+          res = await upvoteQuestion({
             questionId: JSON.parse(itemId),
             userId: JSON.parse(userId),
             hasupVoted,
             path: pathname,
           });
         } else if (type === "answer") {
-          await upvoteAnswer({
+          res = await upvoteAnswer({
             answerId: JSON.parse(itemId),
             userId: JSON.parse(userId),
             hasupVoted,
             path: pathname,
           });
         }
+
+        if (res && res?.error) return toast.error(res?.error);
+
         return !hasupVoted
           ? toast.success(`Upvoted successfully`)
           : toast.warning("Upvote removed");
       }
 
       if (action === "downvote") {
+        let res;
         if (type === "question") {
-          await downvoteQuestion({
+          res = await downvoteQuestion({
             questionId: JSON.parse(itemId),
             userId: JSON.parse(userId),
             hasdownVoted,
             path: pathname,
           });
         } else if (type === "answer") {
-          await downvoteAnswer({
+          res = await downvoteAnswer({
             answerId: JSON.parse(itemId),
             userId: JSON.parse(userId),
             hasdownVoted,
             path: pathname,
           });
         }
+
+        if (res && res?.error) return toast.error(res?.error);
+
         return !hasdownVoted
           ? toast.success(`Downvote successfully`)
           : toast.warning("Downvote removed");
       }
     } catch (e: any) {
-      return toast.error(e?.message ?? "something went wrong");
+      console.log({ e });
     }
   };
 
