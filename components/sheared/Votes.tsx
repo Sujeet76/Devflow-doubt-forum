@@ -87,6 +87,7 @@ const Votes = ({
           : toast.warning("Downvote removed");
       }
     } catch (e: any) {
+      console.log(e);
       return toast.error(e?.message ?? "something went wrong");
     }
   };

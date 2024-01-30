@@ -3,6 +3,7 @@ import { ResizablePanel } from "@/components/ui/resizable";
 import { ChevronsLeft } from "lucide-react";
 import React from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
+import UserItem from "./userItem";
 
 const Sidebar = () => {
   const panelRef = React.useRef<ImperativePanelHandle>(null);
@@ -35,7 +36,7 @@ const Sidebar = () => {
           </div>
         </div>
         <div>
-          <p>Document</p>
+          <UserItem />
         </div>
       </aside>
     </ResizablePanel>
