@@ -17,7 +17,7 @@ const NavContent = () => {
   const { userId } = useAuth();
 
   return (
-    <section className='flex h-full flex-col gap-4 pt-16'>
+    <section className='flex h-dvh flex-col gap-4 pt-16'>
       {sidebarLinks.map((item) => {
         const isActive =
           (pathname.includes(item.route) && item.route.length > 1) ||
@@ -115,7 +115,7 @@ const MobileNav = () => {
           </p>
         </Link>
 
-        <div className='no-scrollbar flex h-[calc(100vh-80px)] flex-col justify-between overflow-y-auto'>
+        <div className='no-scrollbar flex h-[calc(100dvh-80px)] flex-col justify-between overflow-y-auto'>
           <SheetClose asChild>
             <NavContent />
           </SheetClose>
