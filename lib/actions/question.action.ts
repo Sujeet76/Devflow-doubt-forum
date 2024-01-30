@@ -201,7 +201,9 @@ export const upvoteQuestion = async (params: QuestionVoteParams) => {
     revalidatePath(path);
   } catch (error: any) {
     console.log("Error while upvote => ", error);
-    throw error;
+    throw new Error(
+      error?.message ?? "something went wrong while up vote question"
+    );
   }
 };
 
@@ -256,7 +258,9 @@ export const downvoteQuestion = async (params: QuestionVoteParams) => {
     revalidatePath(path);
   } catch (error: any) {
     console.log("Error while upvote => ", error);
-    throw error;
+    throw new Error(
+      error?.message ?? "something went wrong while down vote question"
+    );
   }
 };
 
