@@ -7,6 +7,7 @@ import {
   fetchUserLocation,
 } from "@/lib/actions/jobs.action";
 import { Job } from "@/types";
+import type { Metadata } from "next";
 
 interface Props {
   searchParams: {
@@ -15,6 +16,14 @@ interface Props {
     page: string;
   };
 }
+
+export const metadata: Metadata = {
+  title: "Jobs | Dev Overflow",
+  description:
+    "Discover job opportunities in the tech industry on Dev Overflow. Search for jobs based on your preferred location and field of expertise.",
+  keywords:
+    "Dev Overflow, Tech Jobs, Job Search, Software Engineer Jobs, Developer Jobs, Programming Careers, Tech Industry",
+};
 
 const Jobs = async ({ searchParams }: Props) => {
   // this page is rendered on server side means the location it will return is the server location on initial page render

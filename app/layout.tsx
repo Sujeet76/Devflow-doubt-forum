@@ -20,11 +20,22 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env?.NEXT_PUBLIC_URL ?? ""),
   title: "DevFlow",
   description:
     "A community-driven platform for asking and answering programming question. Get help, share knowledge, and collaborate with developers from around the world. Explore topics in web development, mobile app development, algorithms, data structures, and more.",
   icons: {
     icon: "assets/images/site-logo.svg",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_IE",
+    url: process.env?.NEXT_PUBLIC_URL,
+    siteName: "DevFlow",
+    title: "DevFlow | Doubt Forum",
+    description:
+      "A community-driven platform for asking and answering programming question. Get help, share knowledge, and collaborate with developers from around the world. Explore topics in web development, mobile app development, algorithms, data structures, and more.",
+    images: ["/assets/images/meta.png"],
   },
 };
 

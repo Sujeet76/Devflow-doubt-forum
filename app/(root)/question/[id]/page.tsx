@@ -11,10 +11,34 @@ import { getUserById } from "@/lib/actions/user.action";
 import AllAnswers from "@/components/sheared/AllAnswers";
 import Votes from "@/components/sheared/Votes";
 import NoResult from "@/components/sheared/NoResult";
+import type { Metadata } from "next";
 
 interface QuestionAnswerParams {
   id: string;
 }
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> => {
+  const result = await getQuestionById({ questionId: params.id });
+
+  return {
+    title: `${result.title} | Dev overflow`,
+    description: `$${result.content.replace(/<[^>]*>/g, "")}`,
+    keywords: `${result.tags.map((tag: any) => tag.name).join(", ")}`,
+    openGraph: {
+      type: "website",
+      locale: "en_IN",
+      url: process.env?.NEXT_PUBLIC_URL,
+      siteName: "DevFlow",
+      title: `${result.title} | Dev overflow`,
+      description: `${result.content.replace(/<[^>]*>/g, "")}`,
+      images: ["/assets/images/meta2.png"],
+    },
+  };
+};
 
 const QuestionAnswer = async ({ params }: { params: QuestionAnswerParams }) => {
   const result = await getQuestionById({ questionId: params.id });

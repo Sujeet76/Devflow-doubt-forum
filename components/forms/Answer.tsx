@@ -96,32 +96,30 @@ const Answer = ({
         description: "You cannot generate Ai answer on your own question",
       });
     }
-    toast.promise(
-      fetch(`${process.env.NEXT_PUBLIC_URL}/api/chatgpt`, {
-        method: "POST",
-        body: JSON.stringify({ question }),
-      }),
-      {
-        loading: "Ai is generating answer...",
-        success: async (data) => {
-          const apiAnswer = await data.json();
-          // Convert plain text to HTML format
-          const formattedAnswer = apiAnswer.reply.replace(/\n/g, "<br />");
-          if (editorRef.current) {
-            const editor = editorRef.current as any;
-            editor.setContent(formattedAnswer);
-          }
-          return "AI answer generated successfully";
-        },
-        error: (e) => {
-          setIsGeneratingAiAnswer(false);
-          return e?.message ?? "something went wrong while generating answer";
-        },
-        finally: () => {
-          setIsGeneratingAiAnswer(false);
-        },
-      }
-    );
+
+    // fetch ai answer
+    const promise = fetch(`${process.env.NEXT_PUBLIC_URL}/api/chatgpt`, {
+      method: "POST",
+      body: JSON.stringify({ question }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedAnswer = data.reply.replace(/\n/g, "<br />");
+        if (editorRef.current) {
+          const editor = editorRef.current as any;
+          editor.setContent(formattedAnswer);
+        }
+      });
+
+    toast.promise(promise, {
+      loading: "Ai is generating answer...",
+      success: "Ai generated answer successfully",
+      error: (e) =>
+        e?.message ?? "something went wrong while generating answer",
+      finally: () => {
+        setIsGeneratingAiAnswer(false);
+      },
+    });
   };
 
   return (

@@ -13,6 +13,35 @@ import QuestionTab from "@/components/sheared/QuestionTab";
 import AnswerTab from "@/components/sheared/AnswerTab";
 import NoResult from "@/components/sheared/NoResult";
 import TopInteractedTags from "@/components/sheared/TopInteractedTags";
+import type { Metadata } from "next";
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> => {
+  const userInfo = await getUserInfo({
+    userId: params.id,
+  });
+
+  return {
+    title: `${userInfo?.user.name} | Dev overflow`,
+    description: `${userInfo?.user.name}'s profile on Dev Overflow. ${userInfo?.user.bio ?? "Learn more about this developer and their contributions."}`,
+    keywords: `Dev Overflow, Developer Profile, ${userInfo?.user.name}, Coding Questions, Programming Help, Code Collaboration, Learn Coding, Share Code, Programming Community, Software Development`,
+    openGraph: {
+      images: [
+        {
+          url: userInfo?.user.picture,
+          width: 800,
+          height: 600,
+          alt: `${userInfo?.user.name}'s profile picture`,
+        },
+      ],
+      title: `${userInfo?.user.name} | Dev overflow`,
+      description: `${userInfo?.user.name}'s profile on Dev Overflow. ${userInfo?.user.bio ?? "Learn more about this developer and their contributions."}`,
+    },
+  };
+};
 
 const Profile = async ({ params, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();

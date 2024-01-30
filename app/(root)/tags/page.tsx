@@ -4,7 +4,16 @@ import LocalSearch from "@/components/sheared/search/LocalSearch";
 import { TagFilters } from "@/constants/filters";
 import { getAllTags } from "@/lib/actions/tag.action";
 import { SearchParamsProps } from "@/types";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Tags | Dev Overflow",
+  description:
+    "Join our vibrant community at Dev Overflow! Connect with developers worldwide, share knowledge, collaborate on projects, and grow your coding skills. Whether you're a beginner or an expert, there's a place for you here.",
+  keywords:
+    "Dev Overflow, Developer Community, Programming Tags, Coding Topics, Software Development",
+};
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllTags({

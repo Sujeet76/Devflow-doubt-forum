@@ -3,7 +3,16 @@ import { getQuestionById } from "@/lib/actions/question.action";
 import { getUserById } from "@/lib/actions/user.action";
 import { ParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Edit Question | Dev Overflow",
+  description:
+    "Update your question on Dev Overflow. Modify your question details, clarify your doubts, and enhance your learning experience.",
+  keywords:
+    "Dev Overflow, Edit Question, Update Question, Coding Questions, Programming Help, Learn Coding, Developer Community",
+};
 
 const Edit = async ({ params }: ParamsProps) => {
   const { userId } = auth();

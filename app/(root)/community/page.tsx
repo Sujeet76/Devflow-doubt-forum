@@ -6,6 +6,12 @@ import { getAllUsers } from "@/lib/actions/user.action";
 import Link from "next/link";
 import { SearchParamsProps } from "@/types";
 import Pagination from "@/components/sheared/Pagination";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Community | Dev Overflow",
+  description: "Dev Overflow is a community of developers. Join us",
+};
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   // let result;
