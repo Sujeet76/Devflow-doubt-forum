@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+export const runtime = "edge";
+
 export const POST = async (req: Request) => {
   const { question } = await req.json();
 

@@ -28,7 +28,7 @@ const UserCard = async ({ user }: UserProps) => {
           alt='user profile picture'
           width={100}
           height={100}
-          className='rounded-full'
+          className='size-[100px] rounded-full object-cover'
         />
         <div className='mt-4 text-center'>
           <h3 className='h3-bold text-dark200_light900 line-clamp-1'>
@@ -50,7 +50,9 @@ const UserCard = async ({ user }: UserProps) => {
               ))}
             </div>
           ) : (
-            <Badge>No tags yet</Badge>
+            <Badge className='body-regular text-dark500_light500'>
+              No tags yet
+            </Badge>
           )}
         </div>
       </article>
