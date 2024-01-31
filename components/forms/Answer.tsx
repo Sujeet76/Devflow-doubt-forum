@@ -98,9 +98,11 @@ const Answer = ({
     }
 
     // fetch ai answer
+    // filter question remove html tags
+    const filteredQuestion = question.replace(/<[^>]*>/g, "");
     const promise = fetch(`${process.env.NEXT_PUBLIC_URL}/api/chatgpt`, {
       method: "POST",
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question: filteredQuestion }),
     })
       .then((res) => res.json())
       .then((data) => {
