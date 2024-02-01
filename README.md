@@ -132,13 +132,13 @@ Replace with your actual API keys and MongoDB URI.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/devflow.git
+   git clone [https://github.com/your-username/devflow.git](https://github.com/Sujeet76/Devflow-doubt-forum.git)
    ```
 
 2. Change into the project directory:
 
    ```bash
-   cd devflow
+   cd Devflow-doubt-forum
    ```
 
 3. Install dependencies:
