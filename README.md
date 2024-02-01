@@ -4,6 +4,10 @@
 
 DevFlow stands as a comprehensive web application, meticulously crafted to serve as the ultimate hub for developers. Built using Next.js 14, TypeScript, MongoDB, and Tailwind CSS, the platform not only ensures a fully responsive and SEO-optimized experience but also incorporates cutting-edge features that elevate the coding journey.
 
+### images preview
+![InCollage_20240201_102650941](https://github.com/Sujeet76/Devflow-doubt-forum/assets/126092124/ad9e7f34-dabe-47f4-9bed-eef28aabe739)
+
+
 ## Key Features
 
 ### 1. **User Authentication:**
