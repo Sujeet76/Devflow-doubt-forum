@@ -35,7 +35,7 @@ const AnswerTab = async ({ searchParams, userId, clerkId }: AnswerTabProps) => {
           ))
         ) : (
           <div className='paragraph-medium text-dark400_light800'>
-            No Answer Any Question yet
+            No Answer
           </div>
         )}
       </div>

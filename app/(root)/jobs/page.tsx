@@ -1,11 +1,21 @@
+import { Suspense } from "react";
+import { v4 as uuid } from "uuid";
+
+// ui import
 import JobCard from "@/components/cards/JobCard";
+import QuestionLoading from "@/components/home/questionLoading";
 import JobsFilters from "@/components/jobs/JobsFilter";
 import Pagination from "@/components/sheared/Pagination";
+import Await from "@/lib/await";
+
+// server action import
 import {
   fetchCountry,
   fetchJobs,
   fetchUserLocation,
 } from "@/lib/actions/jobs.action";
+
+// types import
 import { Job } from "@/types";
 import type { Metadata } from "next";
 
@@ -28,7 +38,7 @@ export const metadata: Metadata = {
 const Jobs = async ({ searchParams }: Props) => {
   // this page is rendered on server side means the location it will return is the server location on initial page render
   const userLocation = await fetchUserLocation();
-  const jobs = await fetchJobs({
+  const promise = fetchJobs({
     query:
       `${searchParams.q}, ${searchParams?.location}` ??
       `Software Engineer in ${userLocation}`,
@@ -44,33 +54,47 @@ const Jobs = async ({ searchParams }: Props) => {
         <JobsFilters countriesList={countries} />
       </div>
 
-      <section className='light-border mb-9 mt-11 flex flex-col gap-9 border-b pb-9'>
-        {jobs?.length > 0 ? (
-          jobs.map((job: Job, index: number) => {
-            if (job.job_title && job.job_title.toLowerCase() !== "undefined")
-              return (
-                <JobCard
-                  key={`${job.id}-${index}`}
-                  job={job}
+      <Suspense
+        fallback={<QuestionLoading />}
+        key={uuid()}
+      >
+        <Await promise={promise}>
+          {(jobs) => (
+            <>
+              <section className='light-border mb-9 mt-11 flex flex-col gap-9 border-b pb-9'>
+                {jobs?.length > 0 ? (
+                  jobs.map((job: Job, index: number) => {
+                    if (
+                      job.job_title &&
+                      job.job_title.toLowerCase() !== "undefined"
+                    )
+                      return (
+                        <JobCard
+                          key={`${job.id}-${index}`}
+                          job={job}
+                        />
+                      );
+
+                    return null;
+                  })
+                ) : (
+                  <div className='paragraph-regular text-dark200_light800 w-full text-center'>
+                    Oops! We couldn&apos;t find any jobs at the moment. Please
+                    try again later
+                  </div>
+                )}
+              </section>
+
+              {jobs?.length > 0 && (
+                <Pagination
+                  pageNumber={page}
+                  isNext={jobs.length === 10}
                 />
-              );
-
-            return null;
-          })
-        ) : (
-          <div className='paragraph-regular text-dark200_light800 w-full text-center'>
-            Oops! We couldn&apos;t find any jobs at the moment. Please try again
-            later
-          </div>
-        )}
-      </section>
-
-      {jobs?.length > 0 && (
-        <Pagination
-          pageNumber={page}
-          isNext={jobs.length === 10}
-        />
-      )}
+              )}
+            </>
+          )}
+        </Await>
+      </Suspense>
     </>
   );
 };

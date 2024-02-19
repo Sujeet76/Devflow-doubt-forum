@@ -1,12 +1,24 @@
+import Link from "next/link";
+import { Suspense } from "react";
+import { v4 as uuid } from "uuid";
+
+// ui import
 import UserCard from "@/components/cards/UserCard";
 import Filters from "@/components/sheared/Filters";
 import LocalSearch from "@/components/sheared/search/LocalSearch";
-import { UserFilters } from "@/constants/filters";
-import { getAllUsers } from "@/lib/actions/user.action";
-import Link from "next/link";
-import { SearchParamsProps } from "@/types";
 import Pagination from "@/components/sheared/Pagination";
+import Await from "@/lib/await";
+import CardLoading from "./cardLoading";
+
+// constants import
+import { UserFilters } from "@/constants/filters";
+
+// server action import
+import { getAllUsers } from "@/lib/actions/user.action";
+
+// type import
 import type { Metadata } from "next";
+import { SearchParamsProps } from "@/types";
 
 export const metadata: Metadata = {
   title: "Community | Dev Overflow",
@@ -16,7 +28,7 @@ export const metadata: Metadata = {
 const page = async ({ searchParams }: SearchParamsProps) => {
   // let result;
   // TODO:ERROR WHILE DEPLOYMENT ON APP
-  const result = await getAllUsers({
+  const promise = getAllUsers({
     searchQuery: searchParams?.q,
     filter: searchParams?.filter,
     page: searchParams.page ? +searchParams.page : 1,
@@ -41,34 +53,44 @@ const page = async ({ searchParams }: SearchParamsProps) => {
         </div>
       </div>
 
-      <section className='mt-12 flex flex-wrap gap-4'>
-        {result && result.users.length > 0 ? (
-          result.users.map((user) => (
-            <UserCard
-              key={user._id}
-              user={user}
-            />
-          ))
-        ) : (
-          <div className='paragraph-regular text-dark200_light800 mx-auto max-w-4xl text-center'>
-            <p>No users yet</p>
-            <Link
-              href='/sign-up'
-              className='mt-2 font-bold text-accent-blue'
-            >
-              Join to be the first
-            </Link>
-          </div>
-        )}
-      </section>
-
-      {/* pagination */}
-      {result && result?.users.length > 0 && (
-        <Pagination
-          pageNumber={searchParams?.page ? +searchParams.page : 1}
-          isNext={result?.isNext}
-        />
-      )}
+      <Suspense
+        fallback={<CardLoading />}
+        key={uuid()}
+      >
+        <Await promise={promise}>
+          {({ users, isNext }) => (
+            <>
+              <section className='mt-12 flex flex-wrap gap-4'>
+                {users && users.length > 0 ? (
+                  users.map((user) => (
+                    <UserCard
+                      key={user._id}
+                      user={user}
+                    />
+                  ))
+                ) : (
+                  <div className='paragraph-regular text-dark200_light800 mx-auto max-w-4xl text-center'>
+                    <p>No users yet</p>
+                    <Link
+                      href='/sign-up'
+                      className='mt-2 font-bold text-accent-blue'
+                    >
+                      Join to be the first
+                    </Link>
+                  </div>
+                )}
+              </section>
+              {/* pagination */}
+              {users && users.length > 0 && (
+                <Pagination
+                  pageNumber={searchParams?.page ? +searchParams.page : 1}
+                  isNext={isNext}
+                />
+              )}
+            </>
+          )}
+        </Await>
+      </Suspense>
     </>
   );
 };

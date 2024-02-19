@@ -35,7 +35,7 @@ const RightSidebar = async () => {
             ))}
         </div>
       </div>
-      <div className='mt-16'>
+      <div className='mt-10'>
         <h3 className='h3-bold text-dark200_light900 text-xl'>Popular Tags</h3>
         <div className='mt-7 flex w-full flex-col gap-[30px]'>
           {tags &&

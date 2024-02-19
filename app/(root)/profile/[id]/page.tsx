@@ -4,7 +4,7 @@ import { URLProps } from "@/types";
 import { SignedIn, auth } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getJoinedDate } from "@/lib/utils";
 import ProfileLink from "@/components/sheared/ProfileLink";
@@ -14,6 +14,8 @@ import AnswerTab from "@/components/sheared/AnswerTab";
 import NoResult from "@/components/sheared/NoResult";
 import TopInteractedTags from "@/components/sheared/TopInteractedTags";
 import type { Metadata } from "next";
+import { v4 as uuid } from "uuid";
+import QuestionLoading from "@/components/home/questionLoading";
 
 export const generateMetadata = async ({
   params,
@@ -142,20 +144,30 @@ const Profile = async ({ params, searchParams }: URLProps) => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value='top-posts'>
-            <QuestionTab
-              searchParams={searchParams}
-              userId={userInfo?.user._id}
-              clerkId={userInfo?.user.clerkId}
-              totalQuestion={userInfo?.totalQuestions ?? 0}
-            />
+            <Suspense
+              fallback={<QuestionLoading />}
+              key={uuid()}
+            >
+              <QuestionTab
+                searchParams={searchParams}
+                userId={userInfo?.user._id}
+                clerkId={userInfo?.user.clerkId}
+                totalQuestion={userInfo?.totalQuestions ?? 0}
+              />
+            </Suspense>
           </TabsContent>
           <TabsContent value='answer'>
-            <AnswerTab
-              searchParams={searchParams}
-              userId={userInfo?.user._id}
-              clerkId={userInfo?.user.clerkId}
-              totalAnswer={userInfo?.totalAnswers ?? 0}
-            />
+            <Suspense
+              fallback={<QuestionLoading />}
+              key={uuid()}
+            >
+              <AnswerTab
+                searchParams={searchParams}
+                userId={userInfo?.user._id}
+                clerkId={userInfo?.user.clerkId}
+                totalAnswer={userInfo?.totalAnswers ?? 0}
+              />
+            </Suspense>
           </TabsContent>
         </Tabs>
         {/* top interacted tags */}

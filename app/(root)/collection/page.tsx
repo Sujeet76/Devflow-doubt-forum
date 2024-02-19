@@ -1,17 +1,29 @@
+import { auth } from "@clerk/nextjs";
+import { Suspense } from "react";
+import { v4 as uuid } from "uuid";
+
+// ui imports
 import QuestionCard from "@/components/cards/QuestionCard";
+import QuestionLoading from "@/components/home/questionLoading";
 import Filters from "@/components/sheared/Filters";
 import NoResult from "@/components/sheared/NoResult";
 import Pagination from "@/components/sheared/Pagination";
 import LocalSearch from "@/components/sheared/search/LocalSearch";
+import Await from "@/lib/await";
+
+// constants import
 import { QuestionFilters } from "@/constants/filters";
-import { getSavedQuestions } from "@/lib/actions/user.action";
+
+// types import
 import { SearchParamsProps } from "@/types";
-import { auth } from "@clerk/nextjs";
+
+// server action import
+import { getSavedQuestions } from "@/lib/actions/user.action";
 
 export default async function Collection({ searchParams }: SearchParamsProps) {
   const { userId } = auth();
   if (!userId) return null;
-  const result = await getSavedQuestions({
+  const promise = getSavedQuestions({
     clerkId: userId,
     searchQuery: searchParams?.q,
     filter: searchParams?.filter,
@@ -36,41 +48,52 @@ export default async function Collection({ searchParams }: SearchParamsProps) {
         />
       </div>
 
-      {/* card component */}
-      <div className='mt-10 flex w-full flex-col gap-6'>
-        {result && result?.savedQuestion?.saved?.length > 0 ? (
-          result?.savedQuestion.saved.map((question: any) => (
-            <QuestionCard
-              key={question._id}
-              _id={question._id}
-              title={question.title}
-              tags={question.tags}
-              author={question.author}
-              upvotes={question.upvotes?.length}
-              createdAt={question.createdAt}
-              views={question.views}
-              answers={question.answers}
-            />
-          ))
-        ) : (
-          <NoResult
-            title='There are no saved question to show'
-            description={`Be the first to break the silence! 🚀 Ask a Question and kickstart the
+      <Suspense
+        fallback={<QuestionLoading />}
+        key={uuid()}
+      >
+        <Await promise={promise}>
+          {(result) => (
+            <>
+              {/* card component */}
+              <div className='mt-10 flex w-full flex-col gap-6'>
+                {result && result?.savedQuestion?.saved?.length > 0 ? (
+                  result?.savedQuestion.saved.map((question: any) => (
+                    <QuestionCard
+                      key={question._id}
+                      _id={question._id}
+                      title={question.title}
+                      tags={question.tags}
+                      author={question.author}
+                      upvotes={question.upvotes?.length}
+                      createdAt={question.createdAt}
+                      views={question.views}
+                      answers={question.answers}
+                    />
+                  ))
+                ) : (
+                  <NoResult
+                    title='There are no saved question to show'
+                    description={`Be the first to break the silence! 🚀 Ask a Question and kickstart the
             discussion. our query could be the next big thing others learn from. Get
             involved! 💡`}
-            link='/ask-question'
-            linkTitle='Ask a Question'
-          />
-        )}
-      </div>
+                    link='/ask-question'
+                    linkTitle='Ask a Question'
+                  />
+                )}
+              </div>
 
-      {/* pagination */}
-      {result && result?.savedQuestion.saved.length > 0 && (
-        <Pagination
-          pageNumber={searchParams?.page ? +searchParams.page : 1}
-          isNext={result?.isNext}
-        />
-      )}
+              {/* pagination */}
+              {result && result?.savedQuestion.saved.length > 0 && (
+                <Pagination
+                  pageNumber={searchParams?.page ? +searchParams.page : 1}
+                  isNext={result?.isNext}
+                />
+              )}
+            </>
+          )}
+        </Await>
+      </Suspense>
     </>
   );
 }

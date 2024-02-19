@@ -226,3 +226,17 @@ export async function getTagOnKeyStroke(searchTag: string) {
     console.log(error);
   }
 }
+
+export async function getTagById(tagId: string) {
+  try {
+    connectToDB();
+
+    const tag = await Tag.findById(tagId);
+
+    if (!tag) throw new Error("No tags found");
+
+    return tag;
+  } catch (error) {
+    console.log(error);
+  }
+}
