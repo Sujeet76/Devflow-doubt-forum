@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { getAllUsers, getUserInfo } from "@/lib/actions/user.action";
+import { getUserInfo } from "@/lib/actions/user.action";
 import { URLProps } from "@/types";
 import { SignedIn, auth } from "@clerk/nextjs";
 import Image from "next/image";
@@ -17,12 +17,13 @@ import type { Metadata } from "next";
 import { v4 as uuid } from "uuid";
 import QuestionLoading from "@/components/home/questionLoading";
 
+// TODO : this is not working
 // this is statically generate the page at build time which will lead to performance improvement
-export const generateStaticParams = async (): Promise<string[]> => {
-  const data = await getAllUsers({});
+// export const generateStaticParams = async (): Promise<string[]> => {
+//   const data = await getAllUsers({});
 
-  return data?.users.map((user) => user.clerkId);
-};
+//   return data?.users.map((user) => user.clerkId);
+// };
 
 export const generateMetadata = async ({
   params,
