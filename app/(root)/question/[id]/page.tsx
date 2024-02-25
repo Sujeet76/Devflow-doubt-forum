@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getQuestionById } from "@/lib/actions/question.action";
+import { getQuestionById, getQuestions } from "@/lib/actions/question.action";
 import Image from "next/image";
 import Metric from "@/components/sheared/Metric";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
@@ -16,6 +16,13 @@ import type { Metadata } from "next";
 interface QuestionAnswerParams {
   id: string;
 }
+
+// this is statically generate the page at build time which will lead to performance improvement
+export const generateStaticParams = async () => {
+  const data = await getQuestions({});
+
+  return data?.questions.map((question) => question._id);
+};
 
 export const generateMetadata = async ({
   params,
