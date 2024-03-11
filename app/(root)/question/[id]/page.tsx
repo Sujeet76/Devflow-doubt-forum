@@ -17,15 +17,6 @@ interface QuestionAnswerParams {
   id: string;
 }
 
-// TODO : this is not working
-// // this is statically generate the page at build time which will lead to performance improvement
-// export const generateStaticParams = async (): Promise<string[]> => {
-//   const data = await getQuestions({});
-//   if (!data) return [];
-
-//   return data.questions.map((question) => question._id);
-// };
-
 export const generateMetadata = async ({
   params,
 }: {

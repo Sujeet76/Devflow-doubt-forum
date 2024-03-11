@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { v4 as uuid } from "uuid";
 
 // ui import
 import Filters from "@/components/sheared/Filters";
@@ -50,10 +49,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
           />
         </div>
       </div>
-      <Suspense
-        fallback={<TagListLoading />}
-        key={uuid()}
-      >
+      <Suspense fallback={<TagListLoading />}>
         <Await promise={promise}>
           {(result) => (
             <>

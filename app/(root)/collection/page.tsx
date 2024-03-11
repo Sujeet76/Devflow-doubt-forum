@@ -1,6 +1,5 @@
 import { auth } from "@clerk/nextjs";
 import { Suspense } from "react";
-import { v4 as uuid } from "uuid";
 
 // ui imports
 import QuestionCard from "@/components/cards/QuestionCard";
@@ -48,10 +47,7 @@ export default async function Collection({ searchParams }: SearchParamsProps) {
         />
       </div>
 
-      <Suspense
-        fallback={<QuestionLoading />}
-        key={uuid()}
-      >
+      <Suspense fallback={<QuestionLoading />}>
         <Await promise={promise}>
           {(result) => (
             <>

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { v4 as uuid } from "uuid";
 
 // ui import
 import UserCard from "@/components/cards/UserCard";
@@ -53,10 +52,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
         </div>
       </div>
 
-      <Suspense
-        fallback={<CardLoading />}
-        key={uuid()}
-      >
+      <Suspense fallback={<CardLoading />}>
         <Await promise={promise}>
           {({ users, isNext }) => (
             <>

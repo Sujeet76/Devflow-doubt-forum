@@ -1,6 +1,4 @@
 import { Suspense } from "react";
-import { v4 as uuid } from "uuid";
-
 // ui import
 import JobCard from "@/components/cards/JobCard";
 import QuestionLoading from "@/components/home/questionLoading";
@@ -54,10 +52,7 @@ const Jobs = async ({ searchParams }: Props) => {
         <JobsFilters countriesList={countries} />
       </div>
 
-      <Suspense
-        fallback={<QuestionLoading />}
-        key={uuid()}
-      >
+      <Suspense fallback={<QuestionLoading />}>
         <Await promise={promise}>
           {(jobs) => (
             <>

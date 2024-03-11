@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { v4 as uuid } from "uuid";
 
 // ui import
 import Await from "@/lib/await";
@@ -48,10 +47,7 @@ const Tag = async (prop: URLProps) => {
         />
       </div>
 
-      <Suspense
-        fallback={<QuestionLoading />}
-        key={uuid()}
-      >
+      <Suspense fallback={<QuestionLoading />}>
         <Await promise={promise}>
           {(result) => (
             <>

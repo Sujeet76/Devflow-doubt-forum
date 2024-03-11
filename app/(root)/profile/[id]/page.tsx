@@ -14,16 +14,7 @@ import AnswerTab from "@/components/sheared/AnswerTab";
 import NoResult from "@/components/sheared/NoResult";
 import TopInteractedTags from "@/components/sheared/TopInteractedTags";
 import type { Metadata } from "next";
-import { v4 as uuid } from "uuid";
 import QuestionLoading from "@/components/home/questionLoading";
-
-// TODO : this is not working
-// this is statically generate the page at build time which will lead to performance improvement
-// export const generateStaticParams = async (): Promise<string[]> => {
-//   const data = await getAllUsers({});
-
-//   return data?.users.map((user) => user.clerkId);
-// };
 
 export const generateMetadata = async ({
   params,
@@ -154,7 +145,6 @@ const Profile = async ({ params, searchParams }: URLProps) => {
           <TabsContent value='top-posts'>
             <Suspense
               fallback={<QuestionLoading />}
-              key={uuid()}
             >
               <QuestionTab
                 searchParams={searchParams}
@@ -165,10 +155,7 @@ const Profile = async ({ params, searchParams }: URLProps) => {
             </Suspense>
           </TabsContent>
           <TabsContent value='answer'>
-            <Suspense
-              fallback={<QuestionLoading />}
-              key={uuid()}
-            >
+            <Suspense fallback={<QuestionLoading />}>
               <AnswerTab
                 searchParams={searchParams}
                 userId={userInfo?.user._id}

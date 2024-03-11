@@ -1,7 +1,6 @@
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
 import { Suspense } from "react";
-import { v4 as uuid } from "uuid";
 
 // ui import
 import HomeFilters from "@/components/home/HomeFilters";
@@ -85,10 +84,8 @@ export default async function Home({ searchParams }: SearchParamsProps) {
       </div>
 
       {/* card component */}
-      <Suspense
-        fallback={<QuestionLoading />}
-        key={uuid()}
-      >
+      {/* card component */}
+      <Suspense fallback={<QuestionLoading />}>
         <Await promise={result}>
           {({ questions, isNext }) => (
             <>
